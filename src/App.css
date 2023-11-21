@@ -1,0 +1,134 @@
+/* .App {
+  text-align: center;
+}
+
+.App-logo {
+  height: 40vmin;
+  pointer-events: none;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .App-logo {
+    animation: App-logo-spin infinite 20s linear;
+  }
+}
+
+.App-header {
+  background-color: #282c34;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-size: calc(10px + 2vmin);
+  color: white;
+}
+
+.App-link {
+  color: #61dafb;
+}
+
+@keyframes App-logo-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+} */
+
+
+/* Chat Interface CSS */
+
+/* Main chat container */
+.chat-container {
+  display: flex;
+  flex-direction: column;
+  height: 80vh;
+  /* Adjust the height as needed */
+  max-width: 600px;
+  margin: 0 auto;
+  border: 1px solid #e6ecf0;
+  border-radius: 8px;
+  overflow: hidden;
+  background-color: #fff;
+}
+
+/* Container for messages */
+.messages-container {
+  flex-grow: 1;
+  overflow-y: auto;
+  padding: 10px 20px;
+  background-color: #f4f7f9;
+  /* Light grey background similar to the screenshot */
+}
+
+/* Individual message styles */
+.message {
+  max-width: 60%;
+  margin-bottom: 12px;
+  padding: 8px 16px;
+  border-radius: 18px;
+  line-height: 1.4;
+  font-size: 14px;
+}
+
+/* Style for user messages */
+.message.user {
+  background-color: #d1e7dd;
+  /* Light green background for user messages */
+  align-self: flex-end;
+}
+
+/* Style for AI messages */
+.message.ai {
+  background-color: #ffffff;
+  /* White background for AI messages */
+  align-self: flex-start;
+  border: 1px solid #e6ecf0;
+  /* Light grey border for AI messages */
+}
+
+/* Input area at the bottom */
+.input-area {
+  display: flex;
+  border-top: 1px solid #e6ecf0;
+  padding: 12px;
+  background-color: #f4f7f9;
+  /* Light grey background similar to the screenshot */
+}
+
+/* Text input for typing messages */
+.input-area input {
+  flex-grow: 1;
+  margin-right: 8px;
+  padding: 10px;
+  border: 1px solid #e6ecf0;
+  border-radius: 18px;
+  font-size: 14px;
+}
+
+/* Send button */
+.input-area button {
+  padding: 10px 16px;
+  background-color: #1d9bf0;
+  /* Twitter's blue color for the send button */
+  color: white;
+  border: none;
+  border-radius: 18px;
+  cursor: pointer;
+}
+
+.input-area button:hover {
+  background-color: #1a8cd8;
+  /* A slightly darker blue for the hover state */
+}
+
+.textarea-focus-outline-none:focus {
+  outline: none;
+}
+
+.textarea-custom-focus:focus {
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.5);
+  /* A light purple glow instead of an outline */
+}
