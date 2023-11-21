@@ -11,21 +11,66 @@ thread = client.beta.threads.create()
 def readFromS3():
     # Create an S3 client
     s3 = boto3.client('s3')
-
-    # The name of your bucket
+    # Your S3 bucket name
     bucket_name = 'financial-assistant-gpt-bucket'
 
+    # Retrieve the list of existing objects in the bucket
+    response = s3.list_objects_v2(Bucket=bucket_name)
+
+    # List all objects
+    if 'Contents' in response:
+        for obj in response['Contents']:
+            print(f"Object Key: {obj['Key']}")
+            # The local path to which the file should be downloaded
+            local_file_name = '/home/ubuntu/financial_assistant_gpt/server/data' + obj['Key']
+
+            # Downloading the file
+            s3.download_file(bucket_name, obj['Key'], local_file_name)
+    else:
+        print(f"No objects found in bucket {bucket_name}")
+    # The name of your bucket
+   
     # The key of your object within the bucket
     # replace with response from front end
-    object_name = 'google_earnings_2023_q3.txt'
 
-    # The local path to which the file should be downloaded
-    local_file_name = '/home/ubuntu/financial_assistant_gpt/server/' + object_name
+def uploadFilesToAssistant():
+        # Upload the file
+        # at this point we can assume we have the files downlaoded locally
+    # Path to the directory you want to scan
+    folder_path = '/home/ubuntu/financial_assistant_gpt/server/data'
 
-    # Downloading the file
-    s3.download_file(bucket_name, object_name, local_file_name)
+    # List all files and directories in the folder
+    all_entries = os.listdir(folder_path)
+
+    # Filter out directories, keep only files
+    file_names = [f for f in all_entries if os.path.isfile(os.path.join(folder_path, f))]
+
+    print(file_names)
+
+    fileList = []
+
+    for file in file_names:
+        file = client.files.create(
+            file=open(
+                file,
+                "rb",
+            ),
+            purpose="assistants",
+        )
+
+        fileList.append(file)
+
+    
+    file_ids = [file.id for file in fileList]
+
+    assistant = client.beta.assistants.update(
+        "asst_EwyAYD7GsbNhWzO3UeUG78kA",
+        tools=[{"type": "code_interpreter"}, {"type": "retrieval"}],
+        file_ids=file_ids,
+    )
 
 readFromS3()
+uploadFilesToAssistant()
 
 while(True):
     threadMessage = input("What question about travelling did you have? No questions? Enter Q to exit.\n")
@@ -77,5 +122,5 @@ while(True):
     else:
         print("No response from the assistant found.")
 
-def getResponseFromGpt():
+def parseFrontEndResponse():
     print("yo")
