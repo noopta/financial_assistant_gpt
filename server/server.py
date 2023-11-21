@@ -22,7 +22,7 @@ def readFromS3():
         for obj in response['Contents']:
             print(f"Object Key: {obj['Key']}")
             # The local path to which the file should be downloaded
-            local_file_name = '/home/ubuntu/financial_assistant_gpt/server/data' + obj['Key']
+            local_file_name = '/home/ubuntu/financial_assistant_gpt/server/data/' + obj['Key']
 
             # Downloading the file
             s3.download_file(bucket_name, obj['Key'], local_file_name)
@@ -37,7 +37,7 @@ def uploadFilesToAssistant():
         # Upload the file
         # at this point we can assume we have the files downlaoded locally
     # Path to the directory you want to scan
-    folder_path = '/home/ubuntu/financial_assistant_gpt/server/data'
+    folder_path = '/home/ubuntu/financial_assistant_gpt/server/data/'
 
     # List all files and directories in the folder
     all_entries = os.listdir(folder_path)
@@ -52,7 +52,7 @@ def uploadFilesToAssistant():
     for file in file_names:
         file = client.files.create(
             file=open(
-                file,
+                folder_path + file,
                 "rb",
             ),
             purpose="assistants",
