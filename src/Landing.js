@@ -120,99 +120,118 @@ function FileInput() {
     );
 }
 
-function FileUploader() {
-
+function FileUploader(text) {
+    const promises = [];
     const [selectedFiles, setSelectedFiles] = useState([]);
 
     const handleUpload = async () => {
+
         var numUploads = 0;
+        const numFiles = selectedFiles.length;
 
         for (let file of selectedFiles) {
             const reader = new FileReader();
+            const fileType = file.type;
 
-            reader.onload = async (e) => {
-                const data = e.target.result;
-                try {
-                    const loadingTask = pdfjsLib.getDocument({ data });
-                    const pdf = await loadingTask.promise;
-                    const textContents = [];
+            const filePromise = new Promise((resolve, reject) => {
+                reader.onload = async (e) => {
+                    try {
+                        if (fileType === 'text/plain') {
+                            const text = (e.target.result);
+                            console.log(text);
 
-                    for (let i = 1; i <= pdf.numPages; i++) {
-                        const page = await pdf.getPage(i);
-                        const textContent = await page.getTextContent();
+                            await sendDataToS3("financial-assistant-gpt-bucket", file.name, text);
+                            resolve(); // Resolve the promise after upload
 
-                        textContents.push(textContent.items.map(item => item.str).join(' '));
+                        } else {
+                            const data = e.target.result;
+                            const loadingTask = pdfjsLib.getDocument({ data });
+                            const pdf = await loadingTask.promise;
+                            const textContents = [];
+
+                            for (let i = 1; i <= pdf.numPages; i++) {
+                                const page = await pdf.getPage(i);
+                                const textContent = await page.getTextContent();
+
+                                textContents.push(textContent.items.map(item => item.str).join(' '));
+                            }
+
+                            console.log(textContents.join('\n')); // Extracted text
+                            const newFileName = file.name.replace(".pdf", ".txt");
+
+                            await sendDataToS3("financial-assistant-gpt-bucket", newFileName, textContents.join('\n'));
+                            resolve(); // Resolve the promise after upload
+
+                        }
+                    } catch (error) {
+                        console.error('Error processing file', error);
+                        reject(error); // Reject the promise if there's an error
                     }
+                };
+                reader.readAsArrayBuffer(file);
+            });
 
-                    // here we want to send the textContent to the backend to S3
-                    console.log(textContents.join('\n')); // Extracted text
-
-                    // get PDF name and store it to a variable 
-
-                    const newFileName = file.name.replace(".pdf", ".txt");
-
-                    numUploads += sendDataToS3("financial-assistant-gpt-bucket", newFileName, textContents.join('\n'));
-
-                } catch (error) {
-                    console.error('Error processing PDF', error);
-                }
-            };
-
-            if (numUploads == selectedFiles.length) {
-                // all files have been uploaded 
-                // send a request to our backend to retrieve the S3 files and run the GPT-4 model
-                sendResponseToBackend();
-            } else {
-                // some files have not been uploaded yet
-            }
-
-            reader.readAsArrayBuffer(file);
+            promises.push(filePromise);
         }
+
+        Promise.all(promises).then(() => {
+            console.log("All uploads completed");
+            // TODO: You should figure out the content to be sent based on all uploaded files.
+            // For example, you might want to concatenate the names of files or any identifiers which were just uploaded.
+            const text = "All files have been processed and uploaded"; // Provide actual content here
+            sendResponseToBackend(text);
+
+        }).catch((error) => {
+            console.error("Error occurred while uploading files", error);
+            // Handle any error that occurred during processing or uploading files
+        });
     };
 
-    const sendResponseToBackend = async () => {
+    const sendResponseToBackend = async (query) => {
         // send a request to our backend to retrieve the S3 files and run the GPT-4 model
-        // const response = await fetch('http://localhost:5000/', {
-        //     method: 'POST',
-        //     headers: {
-        //         'Content-Type': 'application/json',
-        //     },
-        //     body: JSON.stringify({ text: 'Hello, World!' }),
-        // });
+        const response = await fetch('http://127.0.0.1:5000/post-endpoint', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ text: query }),
+        });
 
-        // const data = await response.json();
+        const data = await response.json();
 
-        // console.log(data); // { text: 'Hello, World!' }
+        console.log(data); // { text: 'Hello, World!' }
     }
 
-    const sendDataToS3 = async (bucketName, fileName, content) => {
-        // financial-assistant-gpt-bucket
-
+    const sendDataToS3 = (bucketName, fileName, content) => {
         const params = {
             Bucket: bucketName,
             Key: fileName,
             Body: content
         };
 
-        try {
-            const data = await s3.putObject(params).promise();
-            console.log('Success', data);
-            return 1;
-        } catch (error) {
-            console.log('Error', error);
-            return 0;
-        }
+        return new Promise((resolve, reject) => {
+            s3.putObject(params, (err, data) => {
+                if (err) {
+                    console.error('Error', err);
+                    reject(err);
+                } else {
+                    console.log('Success');
+                    resolve(data);
+                }
+            });
+        });
     }
+
 
     const handleFileChange = (event) => {
         // Filter out non-PDF files
-        const pdfFiles = Array.from(event.target.files).filter(file => file.type === 'application/pdf');
+        const pdfFiles = Array.from(event.target.files).filter(file => file.type === 'application/pdf' || file.type === 'text/plain');
         setSelectedFiles(pdfFiles);
     };
 
     return (
         <div>
-            <input type="file" onChange={handleFileChange} multiple accept="application/pdf" />
+            <input type="file" onChange={handleFileChange} multiple accept="application/pdf, text/plain" />
             <button onClick={handleUpload}>Upload</button>
         </div>
     );
@@ -353,7 +372,7 @@ export default function Example() {
                         <InformationSection />
 
                         {/* {FileInput()} */}
-                        {FileUploader()}
+                        {FileUploader(text)}
 
                         {/* FAQS */}
 
