@@ -13,6 +13,7 @@ import * as pdfjsLib from 'pdfjs-dist/build/pdf';
 import InformationSection from './InformationSection'
 import AWS from 'aws-sdk';
 import './App.css'; // Make sure to include the CSS file in the same directory
+import { Link } from 'react-router-dom';
 
 pdfjsLib.GlobalWorkerOptions.workerSrc = process.env.PUBLIC_URL + '/pdf.worker.mjs';
 
@@ -25,18 +26,12 @@ AWS.config.update({
 const s3 = new AWS.S3();
 
 const navigation = [
+    { name: 'Home', href: '#' },
+    { name: 'Product', href: '#' },
     { name: 'About', href: '#' },
     { name: 'Contact Us', href: '#' }
 ]
 
-// const faqs = [
-//     {
-//         question: "What's the best thing about Switzerland?",
-//         answer:
-//             "I don't know, but the flag is a big plus. Lorem ipsum dolor sit amet consectetur adipisicing elit. Quas cupiditate laboriosam fugiat.",
-//     },
-//     // More questions...
-// ]
 
 const moods = [
     { name: 'Excited', value: 'excited', icon: FireIcon, iconColor: 'text-white', bgColor: 'bg-red-500' },
@@ -47,23 +42,27 @@ const moods = [
     { name: 'I feel nothing', value: null, icon: XMarkIcon, iconColor: 'text-gray-400', bgColor: 'bg-transparent' },
 ]
 
-function classNames(...classes) {
-    return classes.filter(Boolean).join(' ')
-}
-
-function GenerateRow(faqs, setFaqs, newRowQuestion) {
+// make function async
+const GenerateRow = async (faqs, setFaqs, newRowQuestion) => {
     // gotta make the backend API call here
+    // make program wait until the response is received
+    const response = await sendResponseToBackend(newRowQuestion);
+    function formatTextToHTML(text) {
+        const formattedText = text
+            .replace(/\n/g, '<br>') // Replace line breaks with <br>
+            .replace(/\*\*/g, '') // Optionally handle other markdown-like formatting
+        // Add more replacements as needed
 
-
+        return formattedText;
+    }
 
     setFaqs(prevFaqs => [...prevFaqs, {
         question: newRowQuestion,
-        answer: "",
+        answer: formatTextToHTML(response['answer']),
     }]);
     console.log("yo")
 
 }
-
 
 function InputTextBox(faqs, setFaqs, text, setText) {
     const [selected, setSelected] = useState(moods[5]);
@@ -111,20 +110,11 @@ function InputTextBox(faqs, setFaqs, text, setText) {
     )
 }
 
-function FileInput() {
-    return (
-        <div>
-            <label class="block mb-2 text-sm font-medium text-gray-900 dark:text-gray-300" for="multiple_files">Upload multiple files</label>
-            <input class="block w-full text-sm text-gray-900 dark:text-gray-300 dark:bg-gray-800 dark:border-gray-600 rounded-lg cursor-pointer bg-gray-50 focus:outline-none" id="multiple_files" type="file" multiple />
-        </div>
-    );
-}
-
-function FileUploader(text) {
+function FileUploader(queryInput) {
     const promises = [];
     const [selectedFiles, setSelectedFiles] = useState([]);
 
-    const handleUpload = async () => {
+    const handleUpload = async (query) => {
 
         var numUploads = 0;
         const numFiles = selectedFiles.length;
@@ -175,33 +165,28 @@ function FileUploader(text) {
         }
 
         Promise.all(promises).then(() => {
+            // if (promises.length > 0) {
             console.log("All uploads completed");
+            uploadFilesToAssistant();
             // TODO: You should figure out the content to be sent based on all uploaded files.
             // For example, you might want to concatenate the names of files or any identifiers which were just uploaded.
             const text = "All files have been processed and uploaded"; // Provide actual content here
-            sendResponseToBackend(text);
-
+            console.log(text)
+            // }
         }).catch((error) => {
             console.error("Error occurred while uploading files", error);
             // Handle any error that occurred during processing or uploading files
         });
     };
 
-    const sendResponseToBackend = async (query) => {
+    const uploadFilesToAssistant = async () => {
         // send a request to our backend to retrieve the S3 files and run the GPT-4 model
-        const response = await fetch('http://127.0.0.1:5000/post-endpoint', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ text: query }),
-        });
+        const response = await fetch('http://127.0.0.1:5000/upload-files');
 
         const data = await response.json();
 
         console.log(data); // { text: 'Hello, World!' }
     }
-
     const sendDataToS3 = (bucketName, fileName, content) => {
         const params = {
             Bucket: bucketName,
@@ -230,15 +215,57 @@ function FileUploader(text) {
     };
 
     return (
-        <div>
-            <input type="file" onChange={handleFileChange} multiple accept="application/pdf, text/plain" />
-            <button onClick={handleUpload}>Upload</button>
+        <div className="mb-4">
+            <div className="bg-gray-800 p-6 rounded-lg shadow-lg mx-auto max-w-md">
+                <label htmlFor="file-upload" className="block text-sm text-center font-medium text-gray-300 mb-2">
+                    Upload File
+                </label>
+                <div className="flex flex-col">
+
+                    <div className="flex justify-center items-center mb-4">
+                        <label htmlFor="file-upload" className="block text-center px-6 py-2 text-sm font-medium text-white bg-gray-700 rounded-md border border-gray-600 cursor-pointer hover:bg-gray-600">
+                            Choose files
+                        </label>
+                        <input
+                            id="file-upload"
+                            type="file"
+                            onChange={handleFileChange}
+                            multiple
+                            accept="application/pdf, text/plain"
+                            className="hidden"
+                        />
+                    </div>
+                    <div className="flex justify-center items-center">
+                        <button
+                            onClick={() => handleUpload(queryInput)}
+                            className="text-center px-6 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700 focus:ring-4 focus:outline-none focus:ring-blue-300"
+                        >
+                            Upload
+                        </button>
+                    </div>
+                </div>
+            </div>
         </div>
     );
 }
 
+const sendResponseToBackend = async (query) => {
+    // send a request to our backend to retrieve the S3 files and run the GPT-4 model
+    const response = await fetch('http://127.0.0.1:5000/post-endpoint', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ text: query }),
+    });
 
-export default function Example() {
+    const data = await response.json();
+
+    console.log(data); // { text: 'Hello, World!' }
+    return data;
+}
+
+export default function Landing() {
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
     const [text, setText] = useState('');
     const [faqs, setFaqs] = useState([
@@ -276,7 +303,7 @@ export default function Example() {
                     <div className="hidden lg:flex lg:gap-x-12">
                         {navigation.map((item) => (
                             <a key={item.name} href={item.href} className="text-sm font-semibold leading-6 text-white">
-                                {item.name}
+                                <Link to={"/" + item.name} >{item.name}</Link>
                             </a>
                         ))}
                     </div>
@@ -399,7 +426,7 @@ export default function Example() {
                                                             </Disclosure.Button>
                                                         </dt>
                                                         <Disclosure.Panel as="dd" className="mt-2 pr-12">
-                                                            <p className="text-base leading-7 text-gray-300">{faq.answer}</p>
+                                                            <p dangerouslySetInnerHTML={{ __html: faq.answer }} className="text-base leading-7 text-gray-300"></p>
                                                         </Disclosure.Panel>
                                                     </>
                                                 )}
