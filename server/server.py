@@ -66,7 +66,16 @@ def uploadFilesToAssistant():
         fileList.append(file)
 
     
-    file_ids = [file.id for file in fileList]
+    file_ids = ["file-pkpJaFSfrfvLHkeI9EFmqsJe", "file-bpQAImfohhU66tqcvYLNt5Ks", "file-WLeFeGtsrWxmiFilUU66daJl", "file-24kJTp5XcgMKLHcNsPiaajWi"] + [file.id for file in fileList]
+
+    # imporant FILE ID's for data training related to financial health of a company
+    # file-l86Ggl27G60NPA0iqK3WCh7d
+    # file-CXpg4stcAOCjuHrPX7rVCDlD
+    # file-EOWJi4zXCLxdri8zZaoYZN5l
+    # file-nB62OS4uFjumxwZW8JwPBMm1
+    # file-BWDKzTXIwATXmr3iftpgshFI
+
+     
 
     assistant = client.beta.assistants.update(
         "asst_EwyAYD7GsbNhWzO3UeUG78kA",
@@ -85,7 +94,7 @@ def askAssistant(query):
     run = client.beta.threads.runs.create(
         thread_id=thread.id,
         assistant_id="asst_EwyAYD7GsbNhWzO3UeUG78kA",
-        instructions="Please address the user as Jane Doe. The user has a premium account."
+        instructions="The user has a premium account."
     )
     
     run = client.beta.threads.runs.retrieve(
@@ -93,7 +102,7 @@ def askAssistant(query):
         run_id=run.id
     )
 
-    time.sleep(20)
+    time.sleep(40)
 
     messages = client.beta.threads.messages.list(
         thread_id=thread.id
@@ -120,18 +129,28 @@ def askAssistant(query):
     else:
         return "No response from the assistant found."
 
+def createS3Folder():
+    print("yo")
+
 @app.route('/')
 def parseFrontEndResponse():
     return "yo"
+
+@app.route('/upload-files')
+def uploadFiles():
+    createS3Folder()
+    readFromS3()
+    uploadFilesToAssistant()
+
+    return jsonify({"result": "success"})
 
 @app.route('/post-endpoint', methods=['POST'])
 def handle_post():
     data = request.json
     print("Received data:", data)
 
-    readFromS3()
-    uploadFilesToAssistant()
     response = askAssistant(data['text'])
+    print(response)
 
     return jsonify({"answer": response})
 
