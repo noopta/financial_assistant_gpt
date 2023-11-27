@@ -1,3 +1,3 @@
 # Financial Assitant GPT
 
-Lol wouldn't YOU like to know how to run this project weather boy
+Images and instructions to run this project to be added soon.
