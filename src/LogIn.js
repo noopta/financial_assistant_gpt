@@ -14,21 +14,42 @@ import AWS from 'aws-sdk';
 import * as pdfjsLib from 'pdfjs-dist/build/pdf';
 import { DotLoader } from "react-spinners";
 import { eventWrapper } from '@testing-library/user-event/dist/utils';
+import { useAuth } from './AuthProvider'; // Path to your AuthContext file
 
-/*
-  This example requires some changes to your config:
-  
-  ```
-  // tailwind.config.js
-  module.exports = {
-    // ...
-    plugins: [
-      // ...
-      require('@tailwindcss/forms'),
-    ],
-  }
-  ```
-*/
+const dynamoDB = new AWS.DynamoDB.DocumentClient();
+
+function checkPrimaryKey(primaryKeyValue, loginToAccount) {
+    const params = {
+        TableName: 'financial_assistant_gpt_db',
+        Key: {
+            'email': primaryKeyValue
+        },
+    };
+
+    dynamoDB.get(params, function (err, data) {
+        if (err) {
+            console.error("Error", err);
+        } else {
+            if (Object.keys(data).length === 0) {
+                console.log("No account with that email exists.");
+            } else {
+                console.log("Account with that email found:", data.Item);
+
+                if (data.Item['password'] === document.getElementById("password").value) {
+                    console.log("Password matches.");
+                    const credentials = {
+                        "email": data.Item['email']
+                    }
+
+                    loginToAccount(credentials);
+                } else {
+                    console.log("Password does not match.");
+                }
+            }
+        }
+    });
+}
+
 const navigation = [
     { name: 'Home', href: '#' },
     { name: 'Chat', href: '#' },
@@ -37,17 +58,15 @@ const navigation = [
 ]
 export default function LogIn() {
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+    const { authUser, login, logout } = useAuth();
 
+    const handleSubmit = (event) => {
+        console.log("yo");
+
+        checkPrimaryKey(event.target.email.value, login);
+    }
     return (
         <>
-            {/*
-          This example requires updating your template:
-  
-          ```
-          <html class="h-full bg-gray-900">
-          <body class="h-full">
-          ```
-        */}
             <div className="bg-gray-900 px-6 py-24 lg:px-8">
                 <header className="absolute inset-x-0 top-0 z-50">
                     <nav className="flex items-center justify-between p-6 lg:px-8" aria-label="Global">
@@ -148,7 +167,10 @@ export default function LogIn() {
                     </div>
 
                     <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
-                        <form className="space-y-6" action="#" method="POST">
+                        <form className="space-y-6" action="#" onSubmit={(event) => {
+                            event.preventDefault();
+                            handleSubmit(event)
+                        }}>
                             <div>
                                 <label htmlFor="email" className="block text-sm font-medium leading-6 text-white">
                                     Email address

@@ -5,18 +5,22 @@ import Landing from './Landing';
 import Chat from './Chat';
 import HealthChecker from './HealthChecker';
 import LogIn from './LogIn';
+import { AuthProvider } from './AuthProvider';
+import UserAuthentication from './UserAuthentication';
 
 function App() {
   return (
-    <Router>
-      <Routes>
-        <Route path="/" element={<Landing />} />
-        <Route path="/Home" element={<Landing />} />
-        <Route path="/Chat" element={<Chat />} />
-        <Route path="/Health Checker" element={<HealthChecker />} />
-        <Route path="/Log In" element={<LogIn />} />
-      </Routes>
-    </Router>
+    <AuthProvider>
+      <Router>
+        <Routes>
+          <Route path="/" element={<Landing />} />
+          <Route path="/Home" element={<Landing />} />
+          <Route path="/Chat" element={<Chat />} />
+          <Route path="/Health Checker" element={<HealthChecker />} />
+          <Route path="/Log In" element={<UserAuthentication />} />
+        </Routes>
+      </Router>
+    </AuthProvider>
   );
 }
 
