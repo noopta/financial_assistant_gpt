@@ -13,7 +13,8 @@ export const AuthProvider = ({ children }) => {
     // Implement login logic
     setAuthUser({
       name: userCredentials.username,
-      email: userCredentials.email
+      email: userCredentials.email,
+      company: userCredentials.company
     });
   };
 

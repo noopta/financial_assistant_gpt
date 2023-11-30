@@ -15,6 +15,7 @@ import * as pdfjsLib from 'pdfjs-dist/build/pdf';
 import { DotLoader } from "react-spinners";
 import { eventWrapper } from '@testing-library/user-event/dist/utils';
 import { useAuth } from './AuthProvider'; // Path to your AuthContext file
+import SignUp from './SignUp';
 
 const dynamoDB = new AWS.DynamoDB.DocumentClient();
 
@@ -59,6 +60,7 @@ const navigation = [
 export default function SignedIn() {
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
     const { authUser, login, logout } = useAuth();
+    const [open, setOpen] = useState(true)
 
     const handleSubmit = (event) => {
         console.log("yo");
@@ -100,7 +102,7 @@ export default function SignedIn() {
                             </div>
                             <div className="hidden lg:flex lg:flex-1 lg:justify-end">
                                 <a href="#" className="text-sm font-semibold leading-6 text-white">
-                                    <Link to="/Log In">Log in <span aria-hidden="true">&rarr;</span> </Link>
+                                    <Link to="/Log In">{authUser ? authUser['company'] : "Log In"} <span aria-hidden="true">&rarr;</span></Link>
                                 </a>
                             </div>
                         </nav>
@@ -164,6 +166,16 @@ export default function SignedIn() {
                     </div>
 
 
+
+                    <div className="flex justify-center pt-6">
+                        <button
+                            type="submit"
+                            onClick={logout}
+                            className="inline-flex items-center rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 dark:bg-indigo-700 dark:hover:bg-indigo-600"
+                        >
+                            Log Out
+                        </button>
+                    </div>
                 </div>
             </div>
         </>

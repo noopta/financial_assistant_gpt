@@ -24,6 +24,8 @@ import {
     HeartIcon,
     MagnifyingGlassIcon
 } from '@heroicons/react/20/solid';
+import { useAuth } from './AuthProvider'; // Path to your AuthContext file
+
 
 const navigation = [
     { name: 'Home', href: '#' },
@@ -34,6 +36,8 @@ const navigation = [
 
 export default function HealthChecker() {
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+    const { authUser, login, logout } = useAuth();
+
     return (
 
         <div className="bg-gray-900 px-6 py-24 sm:py-32 lg:px-8">
@@ -68,7 +72,7 @@ export default function HealthChecker() {
                     </div>
                     <div className="hidden lg:flex lg:flex-1 lg:justify-end">
                         <a href="#" className="text-sm font-semibold leading-6 text-white">
-                            <Link to="/Log In">Log in <span aria-hidden="true">&rarr;</span></Link>
+                            <Link to="/Log In">{authUser ? authUser['company'] : "Log In"} <span aria-hidden="true">&rarr;</span></Link>
                         </a>
                     </div>
                 </nav>

@@ -13,6 +13,7 @@ import * as pdfjsLib from 'pdfjs-dist/build/pdf';
 import InformationSection from './InformationSection'
 import AWS from 'aws-sdk';
 import './App.css'; // Make sure to include the CSS file in the same directory
+import { useAuth } from './AuthProvider';
 import { Link } from 'react-router-dom';
 
 pdfjsLib.GlobalWorkerOptions.workerSrc = process.env.PUBLIC_URL + '/pdf.worker.mjs';
@@ -47,6 +48,7 @@ const moods = [
 export default function Landing() {
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
     const [text, setText] = useState('');
+    const [topRightText, setTopRightText] = useState('Log In');
     const [faqs, setFaqs] = useState([
         {
             question: "What's the best thing about Switzerland?",
@@ -54,6 +56,7 @@ export default function Landing() {
         },
         // More questions...
     ]);
+    const { authUser, login, logout } = useAuth();
 
     return (
         <div className="bg-gray-900">
@@ -88,7 +91,7 @@ export default function Landing() {
                     </div>
                     <div className="hidden lg:flex lg:flex-1 lg:justify-end">
                         <a href="#" className="text-sm font-semibold leading-6 text-white">
-                            <Link to="/Log In">Log in <span aria-hidden="true">&rarr;</span></Link>
+                            <Link to="/Log In">{authUser ? authUser['company'] : "Log In"} <span aria-hidden="true">&rarr;</span></Link>
                         </a>
                     </div>
                 </nav>

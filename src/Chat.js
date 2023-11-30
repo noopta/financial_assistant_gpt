@@ -14,6 +14,8 @@ import AWS from 'aws-sdk';
 import * as pdfjsLib from 'pdfjs-dist/build/pdf';
 import { DotLoader } from "react-spinners";
 import { eventWrapper } from '@testing-library/user-event/dist/utils';
+import { useAuth } from './AuthProvider'; // Path to your AuthContext file
+
 
 pdfjsLib.GlobalWorkerOptions.workerSrc = process.env.PUBLIC_URL + '/pdf.worker.mjs';
 
@@ -61,6 +63,8 @@ export default function Chat() {
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
     const [text, setText] = useState('');
     const [faqs, setFaqs] = useState([]);
+    const { authUser, login, logout } = useAuth();
+
 
     const handleFileChange = (event) => {
         // Filter out non-PDF files
@@ -273,7 +277,7 @@ export default function Chat() {
                     </div>
                     <div className="hidden lg:flex lg:flex-1 lg:justify-end">
                         <a href="#" className="text-sm font-semibold leading-6 text-white">
-                            <Link to="/Log In">Log in <span aria-hidden="true">&rarr;</span> </Link>
+                            <Link to="/Log In">{authUser ? authUser['company'] : "Log In"} <span aria-hidden="true">&rarr;</span></Link>
                         </a>
                     </div>
                 </nav>
