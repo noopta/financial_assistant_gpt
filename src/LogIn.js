@@ -17,6 +17,7 @@ import { eventWrapper } from '@testing-library/user-event/dist/utils';
 import { useAuth } from './AuthProvider'; // Path to your AuthContext file
 
 const dynamoDB = new AWS.DynamoDB.DocumentClient();
+const s3 = new AWS.S3();
 
 function checkPrimaryKey(primaryKeyValue, loginToAccount) {
     const params = {
@@ -51,18 +52,122 @@ function checkPrimaryKey(primaryKeyValue, loginToAccount) {
     });
 }
 
-const registerUser = () => {
+const addUserToDynamoDB = async (userInfo) => {
+    const params = {
+        TableName: "financial_assistant_gpt_db",
+        Item: {
+            // Your item's attributes
+            "email": userInfo.email,
+            "firstName": userInfo.firstName,
+            "lastName": userInfo.lastName,
+            "company": userInfo.company,
+            "password": userInfo.password,
+            "country": userInfo.country,
+            "city": userInfo.city
+        }
+    };
+
+    try {
+        await dynamoDB.put(params).promise();
+        console.log("Item added successfully");
+    } catch (error) {
+        console.error("Error adding item:", error);
+    }
+};
+
+const createUserS3Bucket = async (userInfo) => {
+    const params = {
+        Bucket: userInfo.email + "_bucket",
+        CreateBucketConfiguration: {
+            LocationConstraint: 'us-east-2' // e.g., 'us-west-2'
+        }
+    };
+
+    try {
+        const data = await s3.createBucket(params).promise();
+        console.log('Bucket Created Successfully', data.Location);
+    } catch (err) {
+        console.log('Error', err);
+    }
+}
+
+const createUserS3Folders = (userInfo) => {
+    var chatFolderName = "chatFolder/";
+    var newsLetterFolderName = "newsletterFolder/";
+
+    s3.putObject({
+        Bucket: userInfo.email + "_bucket",
+        Key: chatFolderName
+    }, function (err, data) {
+        if (err) {
+            console.log(err);
+        } else {
+            console.log("Successfully created folder");
+        }
+    });
+
+    s3.putObject({
+        Bucket: userInfo.email + "_bucket",
+        Key: newsLetterFolderName
+    }, function (err, data) {
+        if (err) {
+            console.log(err);
+        } else {
+            console.log("Successfully created folder");
+        }
+    });
+}
+
+const registerUser = async (userInfo, thisSetOpen) => {
     // here we want to create an S3 bucket for the user
     // add them to the dynamo DB table 
+    console.log("yo")
+    const response = await fetch('http://127.0.0.1:5000/sign-up', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ text: userInfo }),
+    });
+
+    const data = await response.json();
+
+    if (data["result"] == "success") {
+        // close modal
+        thisSetOpen(false);
+    } else {
+        alert("Error: " + data["result"]);
+    }
+
+    console.log(data); // { text: 'Hello, World!' }
+    // addUserToDynamoDB(userInfo)
     // create a folder in the S3 bucket for them 
+    // createUserS3Bucket(userInfo);
+    // createUserS3Folders(userInfo);
     // for chat interface files
     // and create another folder in the S3 bucket for them
+
     // for health checker files
 }
 
-const RegistrationForm = () => {
+const RegistrationForm = (thisSetOpen) => {
     return (
-        <form>
+        <form onSubmit={(e) => {
+            e.preventDefault();
+            var userInfo = {
+                "email": document.getElementById("signUpEmail").value,
+                "firstName": document.getElementById("first-name").value,
+                "lastName": document.getElementById("last-name").value,
+                "company": document.getElementById("company-name").value,
+                "password": document.getElementById("signUpPassword").value,
+                "country": document.getElementById("country").value,
+                "city": document.getElementById("city").value
+            };
+
+            // make a post request to the backend to add the user to the database
+
+            registerUser(userInfo, thisSetOpen);
+        }}>
             <div className="space-y-12">
 
                 <div className="border-b border-white/10 pb-12">
@@ -106,7 +211,7 @@ const RegistrationForm = () => {
                             </label>
                             <div className="mt-2">
                                 <input
-                                    id="email"
+                                    id="signUpEmail"
                                     name="email"
                                     type="email"
                                     autoComplete="email"
@@ -138,7 +243,7 @@ const RegistrationForm = () => {
                                 <input
                                     type="password"
                                     name="first-name"
-                                    id="first-name"
+                                    id="signUpPassword"
                                     autoComplete="password"
                                     className="block w-full rounded-md border-0 bg-white/5 py-1.5 text-white shadow-sm ring-1 ring-inset ring-white/10 focus:ring-2 focus:ring-inset focus:ring-indigo-500 sm:text-sm sm:leading-6"
                                 />
@@ -152,8 +257,8 @@ const RegistrationForm = () => {
                             <div className="mt-2">
                                 <input
                                     type="password"
-                                    name="last-name"
-                                    id="last-name"
+                                    name="password"
+                                    id="retypePassword"
                                     autoComplete="password"
                                     className="block w-full rounded-md border-0 bg-white/5 py-1.5 text-white shadow-sm ring-1 ring-inset ring-white/10 focus:ring-2 focus:ring-inset focus:ring-indigo-500 sm:text-sm sm:leading-6"
                                 />
@@ -199,7 +304,6 @@ const RegistrationForm = () => {
                     Cancel
                 </button>
                 <button
-                    onClick={() => { registerUser() }}
                     type="submit"
                     className="rounded-md bg-indigo-500 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500"
                 >
@@ -256,7 +360,7 @@ const SignUp = ({ thisOpen, thisSetOpen }) => {
 
                                     <div className="mt-3 text-center sm:mt-5">
                                         <div className="mt-2">
-                                            {RegistrationForm()} {/* Ensure RegistrationForm also supports dark mode */}
+                                            {RegistrationForm(thisSetOpen)} {/* Ensure RegistrationForm also supports dark mode */}
                                         </div>
                                     </div>
                                 </div>
