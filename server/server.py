@@ -4,6 +4,7 @@ import os
 import boto3
 from flask import Flask, request, jsonify
 from flask_cors import CORS
+from botocore.exceptions import NoCredentialsError, ClientError
 
 app = Flask(__name__)
 CORS(app)
@@ -129,6 +130,97 @@ def askAssistant(query):
     else:
         return "No response from the assistant found."
 
+
+def create_bucket(bucket_name, region=None):
+    # convert bucket_name to lower case
+    bucket_name = bucket_name.lower()
+    try:
+        if region is None:
+            s3_client = boto3.client('s3')
+            s3_client.create_bucket(Bucket=bucket_name)
+        else:
+            s3_client = boto3.client('s3', region_name=region)
+            location = {'LocationConstraint': region}
+            s3_client.create_bucket(Bucket=bucket_name, CreateBucketConfiguration=location)
+    except NoCredentialsError:
+        print("Credentials not available")
+        return False
+    except ClientError as e:
+        print(f"An error occurred: {e}")
+        return False
+    return True
+
+def add_user_to_database(userInfo):
+    try:
+        dynamodb = boto3.resource('dynamodb', region_name='us-east-2')
+        table = dynamodb.Table('financial_assistant_gpt_db')
+        response = table.put_item(
+            Item={
+                'email': userInfo['email'],
+                'firstName': userInfo['firstName'],
+                'lastName': userInfo['lastName'],
+                'company': userInfo['company'],
+                'password': userInfo['password'],
+                'country': userInfo['country'],
+                'city': userInfo['city'],
+                'account_type': 'standard_user',
+                'bucket_name': (userInfo['firstName'] + userInfo['lastName'] + '-bucket').lower(),
+                'assistant_name': userInfo['email'] + "Financial Assistant"
+            }
+        )
+    except ClientError as e:
+        print("yo")
+        print(e.response['Error']['Message'])
+        print("yo2")
+        return e.response['Error']['Message']
+    else:
+        return response
+
+
+def create_s3_folders(bucketName):
+    try:
+        s3 = boto3.client('s3')
+        bucket_name = bucketName
+        s3.put_object(Bucket=bucket_name, Key='chat/')
+        s3.put_object(Bucket=bucket_name, Key='newsletter/')
+    except ClientError as e:
+        print(e.response['Error']['Message'])
+        return e.response['Error']['Message']
+    else:
+        return "success"
+
+
+def create_assistant(userInfo):
+    assistant_instructions = """
+    I'm a formal yet approachable expert on company financials.
+
+    'Financial Insight' is an expert on the latest financial data of major companies, specializing in analyzing and summarizing quarterly results. Your role is to provide users with clear, concise, and accurate financial interpretations, focusing on factual, data-driven insights.
+
+    Steer clear of speculative financial advice, future market predictions, and personal investment recommendations. Engage with users by clarifying vague questions and adjust the technicality of your responses based on the user's expertise.
+
+    Your interaction style should be primarily professional and formal, mirroring the serious nature of financial analysis. However, occasional light humor or a slightly casual tone can be used to make complex financial concepts more approachable. Address users in a respectful manner, balancing professionalism with approachability.
+
+    Maintain a balance between providing factual insights and being approachable, ensuring that your responses are both informative and engaging.
+
+    You will be provided specific data to reference for your feedback regarding financial statements and documents. These file are attached as a PDF, and are prefixed with "TRAINING_" as their title. They are the first four files. Use them in conjunction with your existing logic to provide answers and insights.
+
+    When users ask for analysis, summary, etc., the user should have uploaded a financial document related to the company they are asking for. You can access these .txt files or .csv files and use your TRAINING data as well as general knowledge to answer.
+    """
+
+    try:
+        assistant = client.beta.assistants.create(
+            name= userInfo['email'] + "Financial Assistant",
+            model="gpt-4-1106-preview",
+            instructions=assistant_instructions,
+            tools=[{"type": "code_interpreter"}, {"type": "retrieval"}],
+            file_ids=["file-pkpJaFSfrfvLHkeI9EFmqsJe", "file-bpQAImfohhU66tqcvYLNt5Ks", "file-WLeFeGtsrWxmiFilUU66daJl", "file-24kJTp5XcgMKLHcNsPiaajWi"],
+        )
+    except ClientError as e:
+        print(e.response['Error']['Message'])
+        return e.response['Error']['Message']
+    else:
+        return assistant
+
 def createS3Folder():
     print("yo")
 
@@ -153,6 +245,24 @@ def handle_post():
     print(response)
 
     return jsonify({"answer": response})
+
+
+@app.route('/sign-up', methods=['POST'])
+def handle_sign_up():
+    print("yo")
+
+    data = request.json
+    print("Received data:", data)
+    add_user_to_database(data['text'])
+    bucketName = (data['text']['firstName'] + data['text']['lastName'] + '-bucket').lower()
+    
+    create_bucket(bucketName, region='us-east-2')
+    create_s3_folders(bucketName)
+    create_assistant(data['text'])
+    
+    return jsonify({
+        "result": "success"
+    })
 
 if __name__ == '__main__':
     app.run(debug=True)
