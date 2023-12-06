@@ -264,5 +264,173 @@ def handle_sign_up():
         "result": "success"
     })
 
-if __name__ == '__main__':
-    app.run(debug=True)
+@app.route('/create-newsletter', methods=['POST'])
+def create_newsletter():
+    print("yo")
+
+
+def readFromS3Newsletter(s3):
+    # Create an S3 client
+    # Your S3 bucket name
+    bucket_name = 'anuptaislam-bucket'
+    # Specify the folder name
+    folder_name = 'newsletter/'
+
+    # Retrieve the list of objects in the specified folder
+    response = s3.list_objects_v2(Bucket=bucket_name, Prefix=folder_name)
+
+    # List all objects
+    if 'Contents' in response:
+        for obj in response['Contents']:
+            # Skip if the key is a directory
+            if obj['Key'].endswith('/'):
+                continue
+
+            print(f"Object Key: {obj['Key']}")
+            # The local path to which the file should be downloaded
+            local_file_name = os.path.join('/home/ubuntu/financial_assistant_gpt/server/temp', os.path.basename(obj['Key']))
+
+            # Downloading the file
+            s3.download_file(bucket_name, obj['Key'], local_file_name)
+    else:
+        print(f"No objects found in folder '{folder_name}' in bucket {bucket_name}")
+    # The name of your bucket
+   
+    # The key of your object within the bucket
+    # replace with response from front end
+
+def uploadToNewsletterAssistant(assistant_id):
+        # Upload the file
+        # at this point we can assume we have the files downlaoded locally
+    # Path to the directory you want to scan
+    folder_path = '/home/ubuntu/financial_assistant_gpt/server/temp/'
+
+    # List all files and directories in the folder
+    all_entries = os.listdir(folder_path)
+
+    # Filter out directories, keep only files
+    file_names = [f for f in all_entries if os.path.isfile(os.path.join(folder_path, f))]
+
+    print(file_names)
+
+    fileList = []
+
+    for file in file_names:
+        file = client.files.create(
+            file=open(
+                folder_path + file,
+                "rb",
+            ),
+            purpose="assistants",
+        )
+
+        fileList.append(file)
+
+    
+    file_ids = ["file-pkpJaFSfrfvLHkeI9EFmqsJe", "file-bpQAImfohhU66tqcvYLNt5Ks", "file-WLeFeGtsrWxmiFilUU66daJl", "file-24kJTp5XcgMKLHcNsPiaajWi"] + [file.id for file in fileList]
+
+    # imporant FILE ID's for data training related to financial health of a company
+    # file-l86Ggl27G60NPA0iqK3WCh7d
+    # file-CXpg4stcAOCjuHrPX7rVCDlD
+    # file-EOWJi4zXCLxdri8zZaoYZN5l
+    # file-nB62OS4uFjumxwZW8JwPBMm1
+    # file-BWDKzTXIwATXmr3iftpgshFI
+
+     
+
+    assistant = client.beta.assistants.update(
+        assistant_id,
+        tools=[{"type": "code_interpreter"}, {"type": "retrieval"}],
+        file_ids=file_ids,
+    )
+
+def getNewsletterResponse(data, assistant_id):
+    message = client.beta.threads.messages.create(
+        thread_id=thread.id,
+        role="user",
+        content=data['query'] + data['topics']
+    )
+
+    print(data)
+
+    run = client.beta.threads.runs.create(
+        thread_id=thread.id,
+        assistant_id=assistant_id,
+        instructions="The user has a premium account."
+    )
+    
+    run = client.beta.threads.runs.retrieve(
+        thread_id=thread.id,
+        run_id=run.id
+    )
+
+    time.sleep(60)
+
+    messages = client.beta.threads.messages.list(
+        thread_id=thread.id
+    )
+
+    print("getting message")
+    # Iterate through the messages to find the assistant's response
+    assistant_response = None
+    for message in messages:
+        if message.role == "assistant":
+            assistant_response = message.content
+            break
+
+    # Assuming you have the assistant_response as previously retrieved
+    if assistant_response:
+        # Check if the response is a list and not empty
+        if isinstance(assistant_response, list) and assistant_response:
+            # Access the text attribute of the first response
+            message_content = assistant_response[0].text
+            # Now access the value attribute of the text object
+            response_text = message_content.value
+            return response_text
+        else:
+            return "Response is not in the expected list format."
+    else:
+        return "No response from the assistant found."
+
+def createNewsletter(data, s3):
+    # get files from s3 from newsletter folder 
+    # get files from bucket in s3
+    
+    readFromS3Newsletter(s3)
+    uploadToNewsletterAssistant("asst_GJbo1LDmZZgjyxqSwAJhGb3G")
+    newData = {
+        'query': 'Create a financial newsletter for the following topics by providing an analysis and make it less than 2000 characters. Base the analysis off of the text documents uploaded to the assistant related to ' + data['company'] + ': ',
+        'topics': 'cloud, data, ai, machine learning, phones',
+        'company': 'Google'
+    }
+    response = getNewsletterResponse(newData, "asst_GJbo1LDmZZgjyxqSwAJhGb3G")
+
+    print(response)
+
+    # upload them to assistant 
+    # ask the assistant to create a newsletter analysing the financials starting with the latest document
+    # get the response from the assistant
+    # create a pdf file with the response
+    # send an email to the users email with the pdf file attached and make it recurring for the specified
+    # time frame (weekly, monthly, quarterly, yearly)
+
+    # I can pretty much do everything except for the last part which is sending the email with the pdf file attached
+
+    print("yo")
+
+
+# UNCOMMENT WHEN READY TO RUN PRODUCTION
+# if __name__ == '__main__':
+#     app.run(debug=True)
+
+data = {
+    "topics": ["AI", "Cloud", "Machine Learning", "Phones"],
+    "email": "anuptaislam33@gmail.com",
+    "firstName": "Anupta",
+    "lastName": "Islam",   
+    "company": "Google"
+}
+
+s3 = boto3.client('s3')
+
+createNewsletter(data, s3)
