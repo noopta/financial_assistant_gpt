@@ -1,3 +1,4 @@
+import shutil
 import time
 from openai import OpenAI
 import os
@@ -14,21 +15,37 @@ client = OpenAI()
 
 thread = client.beta.threads.create()
 
-def readFromS3():
+def readFromS3(bucket_name, input_assistant_id, fileList):
     # Create an S3 client
     s3 = boto3.client('s3')
     # Your S3 bucket name
-    bucket_name = 'financial-assistant-gpt-bucket'
 
     # Retrieve the list of existing objects in the bucket
-    response = s3.list_objects_v2(Bucket=bucket_name)
+    response = s3.list_objects_v2(Bucket=bucket_name, Prefix="chat/")
+    print(response)
+    newFolderPath = '/home/ubuntu/financial_assistant_gpt/server/chat' + input_assistant_id + '/'
+
+    os.makedirs(newFolderPath, exist_ok=True)
 
     # List all objects
     if 'Contents' in response:
         for obj in response['Contents']:
-            print(f"Object Key: {obj['Key']}")
+            print(f"Object Key: {obj}")
+            if (obj['Key'] == "chat/"):
+                continue
+
+            # get the string from the 6th character and onwards and store it to a variable
+            # this will be the assistant id
+            # then we can use that to upload the files to the assistant
+            # print(obj['Key'][6:])
+
+            # print(f"Object Key: {obj['Key']}")
             # The local path to which the file should be downloaded
-            local_file_name = '/home/ubuntu/financial_assistant_gpt/server/data/' + obj['Key']
+            local_file_name = newFolderPath + obj['Key'][5:]
+
+            fileList.append(obj['Key'][5:])
+
+            fileList[len(fileList) - 1] = fileList[len(fileList) - 1][:len(fileList[len(fileList) - 1]) - 4]
 
             # Downloading the file
             s3.download_file(bucket_name, obj['Key'], local_file_name)
@@ -39,17 +56,23 @@ def readFromS3():
     # The key of your object within the bucket
     # replace with response from front end
 
-def uploadFilesToAssistant():
+def uploadFilesToAssistant(input_assistant_id):
         # Upload the file
         # at this point we can assume we have the files downlaoded locally
     # Path to the directory you want to scan
-    folder_path = '/home/ubuntu/financial_assistant_gpt/server/data/'
+    print("assisnt ID")
+    print(input_assistant_id)
+    newFolderPath = '/home/ubuntu/financial_assistant_gpt/server/chat' + input_assistant_id + '/'
+
+    # os.makedirs(newFolderPath, exist_ok=True)
+
+    # folder_path = '/home/ubuntu/financial_assistant_gpt/server/chat/'
 
     # List all files and directories in the folder
-    all_entries = os.listdir(folder_path)
+    all_entries = os.listdir(newFolderPath)
 
     # Filter out directories, keep only files
-    file_names = [f for f in all_entries if os.path.isfile(os.path.join(folder_path, f))]
+    file_names = [f for f in all_entries if os.path.isfile(os.path.join(newFolderPath, f))]
 
     print(file_names)
 
@@ -58,7 +81,7 @@ def uploadFilesToAssistant():
     for file in file_names:
         file = client.files.create(
             file=open(
-                folder_path + file,
+                newFolderPath + file,
                 "rb",
             ),
             purpose="assistants",
@@ -66,8 +89,11 @@ def uploadFilesToAssistant():
 
         fileList.append(file)
 
+
+    shutil.rmtree(newFolderPath)
+    # os.removedirs(newFolderPath)
     
-    file_ids = ["file-pkpJaFSfrfvLHkeI9EFmqsJe", "file-bpQAImfohhU66tqcvYLNt5Ks", "file-WLeFeGtsrWxmiFilUU66daJl", "file-24kJTp5XcgMKLHcNsPiaajWi"] + [file.id for file in fileList]
+    file_ids = [file.id for file in fileList]
 
     # imporant FILE ID's for data training related to financial health of a company
     # file-l86Ggl27G60NPA0iqK3WCh7d
@@ -75,26 +101,29 @@ def uploadFilesToAssistant():
     # file-EOWJi4zXCLxdri8zZaoYZN5l
     # file-nB62OS4uFjumxwZW8JwPBMm1
     # file-BWDKzTXIwATXmr3iftpgshFI
-
      
 
     assistant = client.beta.assistants.update(
-        "asst_EwyAYD7GsbNhWzO3UeUG78kA",
+        input_assistant_id,
         tools=[{"type": "code_interpreter"}, {"type": "retrieval"}],
         file_ids=file_ids,
     )
 
-def askAssistant(query):
 
+
+def askAssistant(query, input_assistant_id):
+
+    print(query)
+    print("*****")
     message = client.beta.threads.messages.create(
         thread_id=thread.id,
         role="user",
-        content=query
+        content="Use the myfiles_browser tool for the following query (if not possible then use code_intepreter and only send one resposne back. Wait until code_interpeter is done until you respond. Do not say anything like Let's start with the first file and then use another message to analyse the files): "+ query 
     )
 
     run = client.beta.threads.runs.create(
         thread_id=thread.id,
-        assistant_id="asst_EwyAYD7GsbNhWzO3UeUG78kA",
+        assistant_id=input_assistant_id,
         instructions="The user has a premium account."
     )
     
@@ -103,15 +132,40 @@ def askAssistant(query):
         run_id=run.id
     )
 
-    time.sleep(40)
-
-    messages = client.beta.threads.messages.list(
+    initialMessages = client.beta.threads.messages.list(
         thread_id=thread.id
     )
 
+    print(initialMessages)
+    newMessages = None
+
+    assistantFlag = False
+
+    while(True):
+        newMessages = client.beta.threads.messages.list(
+            thread_id=thread.id
+        )
+
+        print("*****")
+        print(newMessages.data[0].role )
+
+        if newMessages.data[0].role == "assistant" and len(newMessages.data[0].content[0].text.value) > 0:
+            break
+
+    # time.sleep(15)
+
+
+    # messages = client.beta.threads.messages.list(
+    #     thread_id=thread.id
+    # )
+    print()
+    print("-------------------")
+    newMessages = client.beta.threads.messages.list(
+        thread_id=thread.id
+    )
     # Iterate through the messages to find the assistant's response
     assistant_response = None
-    for message in messages:
+    for message in newMessages:
         if message.role == "assistant":
             assistant_response = message.content
             break
@@ -130,6 +184,21 @@ def askAssistant(query):
     else:
         return "No response from the assistant found."
 
+def create_cors_configuration(bucket_name):
+    s3 = boto3.client('s3')
+
+    cors_configuration = {
+        'CORSRules': [{
+            'AllowedHeaders': ['*'],
+            'AllowedMethods': ['GET', 'POST', 'PUT', 'DELETE'],
+            'AllowedOrigins': ['http://localhost:3000'],
+            'ExposeHeaders': ['GET', 'POST', 'PUT', 'DELETE'],
+            'MaxAgeSeconds': 3000
+        }]
+    }
+
+    s3.put_bucket_cors(Bucket=bucket_name, CORSConfiguration=cors_configuration)
+    print(f"CORS configuration set for bucket {bucket_name}")
 
 def create_bucket(bucket_name, region=None):
     # convert bucket_name to lower case
@@ -148,9 +217,16 @@ def create_bucket(bucket_name, region=None):
     except ClientError as e:
         print(f"An error occurred: {e}")
         return False
+    
+    create_cors_configuration(bucket_name)
     return True
 
 def add_user_to_database(userInfo):
+    print("PRINTING USERINFO")
+    
+    assistant_id = create_assistant(userInfo)
+
+    print(userInfo)
     try:
         dynamodb = boto3.resource('dynamodb', region_name='us-east-2')
         table = dynamodb.Table('financial_assistant_gpt_db')
@@ -165,7 +241,8 @@ def add_user_to_database(userInfo):
                 'city': userInfo['city'],
                 'account_type': 'standard_user',
                 'bucket_name': (userInfo['firstName'] + userInfo['lastName'] + '-bucket').lower(),
-                'assistant_name': userInfo['email'] + "Financial Assistant"
+                'assistant_name': userInfo['email'] + "Financial Assistant",
+                'assistant_id': assistant_id
             }
         )
     except ClientError as e:
@@ -219,7 +296,7 @@ def create_assistant(userInfo):
         print(e.response['Error']['Message'])
         return e.response['Error']['Message']
     else:
-        return assistant
+        return assistant.id
 
 def createS3Folder():
     print("yo")
@@ -228,20 +305,35 @@ def createS3Folder():
 def parseFrontEndResponse():
     return "yo"
 
-@app.route('/upload-files')
-def uploadFiles():
-    createS3Folder()
-    readFromS3()
-    uploadFilesToAssistant()
+@app.route('/get-s3-files', methods=['POST'])
+def getS3Files():
 
-    return jsonify({"result": "success"})
+
+    return "yo"
+
+@app.route('/upload-files', methods=['POST'])
+def uploadFiles():
+    # createS3Folder()
+    data = request.json
+    
+    print("received data")
+    print(data)
+    fileList = []
+    readFromS3(data["bucket"], data["assistant_id"], fileList)
+    uploadFilesToAssistant(data["assistant_id"])
+
+    print("done")
+    return jsonify({
+        "result": "success",
+        "fileList": fileList
+    })
 
 @app.route('/post-endpoint', methods=['POST'])
 def handle_post():
     data = request.json
-    print("Received data:", data)
+    print("Received dataa:", data)
 
-    response = askAssistant(data['text'])
+    response = askAssistant(data['text'], data['assistant_id'])
     print(response)
 
     return jsonify({"answer": response})
@@ -252,13 +344,13 @@ def handle_sign_up():
     print("yo")
 
     data = request.json
-    print("Received data:", data)
+    # print("Received data:", data)
+    print("Received dataa:", data['text'])
     add_user_to_database(data['text'])
     bucketName = (data['text']['firstName'] + data['text']['lastName'] + '-bucket').lower()
     
     create_bucket(bucketName, region='us-east-2')
     create_s3_folders(bucketName)
-    create_assistant(data['text'])
     
     return jsonify({
         "result": "success"
@@ -266,7 +358,14 @@ def handle_sign_up():
 
 @app.route('/create-newsletter', methods=['POST'])
 def create_newsletter():
-    print("yo")
+    # topics will be sent in as a list
+    data = request.json
+    print("Received dataa:", data)
+    readFromS3Newsletter()
+    uploadToNewsletterAssistant("asst_GJbo1LDmZZgjyxqSwAJhGb3G")
+    response = getNewsletterResponse(data, "asst_GJbo1LDmZZgjyxqSwAJhGb3G")
+    print(response)
+
 
 
 def readFromS3Newsletter(s3):
@@ -336,8 +435,6 @@ def uploadToNewsletterAssistant(assistant_id):
     # file-nB62OS4uFjumxwZW8JwPBMm1
     # file-BWDKzTXIwATXmr3iftpgshFI
 
-     
-
     assistant = client.beta.assistants.update(
         assistant_id,
         tools=[{"type": "code_interpreter"}, {"type": "retrieval"}],
@@ -345,13 +442,12 @@ def uploadToNewsletterAssistant(assistant_id):
     )
 
 def getNewsletterResponse(data, assistant_id):
+    query = 'Create a financial newsletter for the following topics by providing an analysis and make it less than 2000 characters. Base the analysis off of the text documents uploaded to the assistant related to '
     message = client.beta.threads.messages.create(
         thread_id=thread.id,
         role="user",
-        content=data['query'] + data['topics']
+        content=query + data['topics']
     )
-
-    print(data)
 
     run = client.beta.threads.runs.create(
         thread_id=thread.id,
@@ -364,7 +460,7 @@ def getNewsletterResponse(data, assistant_id):
         run_id=run.id
     )
 
-    time.sleep(60)
+    time.sleep(20)
 
     messages = client.beta.threads.messages.list(
         thread_id=thread.id
@@ -420,17 +516,17 @@ def createNewsletter(data, s3):
 
 
 # UNCOMMENT WHEN READY TO RUN PRODUCTION
-# if __name__ == '__main__':
-#     app.run(debug=True)
+if __name__ == '__main__':
+    app.run(debug=True)
 
-data = {
-    "topics": ["AI", "Cloud", "Machine Learning", "Phones"],
-    "email": "anuptaislam33@gmail.com",
-    "firstName": "Anupta",
-    "lastName": "Islam",   
-    "company": "Google"
-}
+# data = {
+#     "topics": ["AI", "Cloud", "Machine Learning", "Phones"],
+#     "email": "anuptaislam33@gmail.com",
+#     "firstName": "Anupta",
+#     "lastName": "Islam",   
+#     "company": "Google"
+# }
 
-s3 = boto3.client('s3')
+# s3 = boto3.client('s3')
 
-createNewsletter(data, s3)
+# createNewsletter(data, s3)
