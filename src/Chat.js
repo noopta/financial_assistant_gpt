@@ -43,14 +43,17 @@ const moods = [
     { name: 'I feel nothing', value: null, icon: XMarkIcon, iconColor: 'text-gray-400', bgColor: 'bg-transparent' },
 ]
 
-const sendResponseToBackend = async (query) => {
+const sendResponseToBackend = async (query, input_assistant_id) => {
     // send a request to our backend to retrieve the S3 files and run the GPT-4 model
     const response = await fetch('http://127.0.0.1:5000/post-endpoint', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ text: query }),
+        body: JSON.stringify({
+            text: query,
+            assistant_id: input_assistant_id,
+        }),
     });
 
     const data = await response.json();
@@ -73,6 +76,7 @@ export default function Chat() {
     };
 
     const promises = [];
+    const [fileList, setFileList] = useState([]);
     const [selectedFiles, setSelectedFiles] = useState([]);
     const [isModalOpen, setModalOpen] = useState(false); // Use this state to control the modal
 
@@ -80,6 +84,13 @@ export default function Chat() {
 
         var numUploads = 0;
         const numFiles = selectedFiles.length;
+        // make a copy of filelist and store it to a tempFileList 
+        // so that we can append to it later
+
+        const tempFileList = fileList.slice();
+
+        console.log("loggin authUser")
+        console.log(authUser)
 
         for (let file of selectedFiles) {
             const reader = new FileReader();
@@ -92,7 +103,13 @@ export default function Chat() {
                             const text = (e.target.result);
                             console.log(text);
 
-                            await sendDataToS3("financial-assistant-gpt-bucket", file.name, text);
+                            if (authUser == null) {
+                                return;
+                            }
+
+                            var authBucketName = authUser['firstName'] + authUser['lastName'] + "-bucket";
+
+                            await sendDataToS3(authBucketName, file.name, text);
                             resolve(); // Resolve the promise after upload
 
                         } else {
@@ -111,7 +128,13 @@ export default function Chat() {
                             console.log(textContents.join('\n')); // Extracted text
                             const newFileName = file.name.replace(".pdf", ".txt");
 
-                            await sendDataToS3("financial-assistant-gpt-bucket", newFileName, textContents.join('\n'));
+                            if (authUser == null) {
+                                return;
+                            }
+
+                            var authBucketName = authUser['firstName'] + authUser['lastName'] + "-bucket";
+
+                            await sendDataToS3(authBucketName, newFileName, textContents.join('\n'));
                             resolve(); // Resolve the promise after upload
 
                         }
@@ -124,12 +147,20 @@ export default function Chat() {
             });
 
             promises.push(filePromise);
+            tempFileList.push(file.name);
         }
 
         Promise.all(promises).then(() => {
             // if (promises.length > 0) {
             console.log("All uploads completed");
-            uploadFilesToAssistant();
+            // setFileList(tempFileList);
+            // setFileList(getFileListFromS3());
+            uploadFilesToAssistant().then(newList => {
+                setFileList(newList);
+            }).catch(error => {
+                console.error("Error occurred while uploading files", error);
+                // Handle any error that occurred during processing or uploading files
+            });
             // TODO: You should figure out the content to be sent based on all uploaded files.
             // For example, you might want to concatenate the names of files or any identifiers which were just uploaded.
             const text = "All files have been processed and uploaded"; // Provide actual content here
@@ -141,18 +172,66 @@ export default function Chat() {
         });
     };
 
-    const uploadFilesToAssistant = async () => {
-        // send a request to our backend to retrieve the S3 files and run the GPT-4 model
-        const response = await fetch('http://127.0.0.1:5000/upload-files');
+    const getFileListFromS3 = async () => {
+        const response = await fetch('http://127.0.0.1:5000/get-s3-files', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                bucket: authUser["firstName"] + authUser["lastName"] + "-bucket"
+            }),
+        });
 
         const data = await response.json();
+        // const response = await fetch('http://127.0.0.1:5000/upload-files');
+
+        // const data = await response.json();
+
+        if (!data['result'] == "success") {
+            console.log("error")
+            return;
+        }
 
         console.log(data); // { text: 'Hello, World!' }
     }
+
+    const uploadFilesToAssistant = async () => {
+        // send a request to our backend to retrieve the S3 files and run the GPT-4 model
+        const response = await fetch('http://127.0.0.1:5000/upload-files', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                bucket: authUser["firstName"] + authUser["lastName"] + "-bucket",
+                assistant_id: authUser["assistant_id"],
+            }),
+        });
+
+        const data = await response.json();
+        // const response = await fetch('http://127.0.0.1:5000/upload-files');
+
+        // const data = await response.json();
+
+        if (!data['result'] == "success") {
+            console.log("error")
+            return;
+        }
+
+        console.log(data); // { text: 'Hello, World!' }
+
+        return data['fileList'];
+    }
+
     const sendDataToS3 = (bucketName, fileName, content) => {
+
+        console.log("yoooooooo")
+        console.log(bucketName)
+
         const params = {
             Bucket: bucketName,
-            Key: fileName,
+            Key: `chat/${fileName}`, // Include the folder name here
             Body: content
         };
 
@@ -173,7 +252,7 @@ export default function Chat() {
         // gotta make the backend API call here
         // make program wait until the response is received
         setModalOpen(true);
-        const response = await sendResponseToBackend(newRowQuestion);
+        const response = await sendResponseToBackend(newRowQuestion, authUser["assistant_id"]);
         setModalOpen(false);
 
         function formatTextToHTML(text) {
@@ -213,7 +292,7 @@ export default function Chat() {
                                 onChange={handleTextChange}
                                 // className="block w-full resize-none border-0 border-b border-transparent p-0 pb-2 dark:text-gray-900 placeholder:dark:text-gray-400 focus:border-indigo-600 focus:ring-0 sm:text-sm sm:leading-6 dark:text-gray-200 dark:placeholder:text-gray-500 dark:focus:border-indigo-400"
                                 className="w-full border-0 bg-transparent pl-11 pr-4 text-white focus:ring-0 sm:text-sm textarea-focus-outline-none"
-                                placeholder="What are you curious about? (e.g. I'm dealing with feelings of jealousy from my friends, how do I deal with this?)"
+                                placeholder="What are you curious about regarding your business financials?"
                                 defaultValue={''}
                             />
                         </div>
@@ -241,6 +320,17 @@ export default function Chat() {
 
     const handleFormSubmit = (event) => {
         event.preventDefault();
+    };
+
+    const handleFileClick = (fileId) => {
+        const svgElement = document.getElementById(fileId);
+        if (svgElement) {
+            if (svgElement.getAttribute("class") === "h-1.5 w-1.5 fill-green-400") {
+                svgElement.setAttribute("class", "h-1.5 w-1.5 fill-indigo-400"); // Replace with your green fill class
+            } else {
+                svgElement.setAttribute("class", "h-1.5 w-1.5 fill-green-400");
+            }
+        }
     };
 
     return (
@@ -366,6 +456,16 @@ export default function Chat() {
                     </form>
                 </div>
             </div>
+            <span className="inline-flex items-center gap-x-1.5 rounded-md px-2 py-1 text-xs font-medium text-white ring-1 ring-inset ring-gray-800">
+                {fileList && fileList.length > 0 && fileList.map((file, index) => (
+                    <span onClick={() => handleFileClick(`svg-${index}`)} className="inline-flex items-center gap-x-1.5 rounded-md px-2 py-1 text-xs font-medium text-white ring-1 ring-inset ring-gray-800">
+                        <svg id={`svg-${index}`} className="h-1.5 w-1.5 fill-indigo-400" viewBox="0 0 6 6" aria-hidden="true">
+                            <circle cx={3} cy={3} r={3} />
+                        </svg>
+                        {file}
+                    </span>
+                ))}
+            </span>
 
             {/* TextInput section */}
             <div className="bg-gray-900">

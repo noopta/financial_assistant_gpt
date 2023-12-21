@@ -14,12 +14,12 @@ import AWS from 'aws-sdk';
 import * as pdfjsLib from 'pdfjs-dist/build/pdf';
 import { DotLoader } from "react-spinners";
 import { eventWrapper } from '@testing-library/user-event/dist/utils';
-import { useAuth } from './AuthProvider'; // Path to your AuthContext file
+import { AuthProvider, useAuth } from './AuthProvider'; // Path to your AuthContext file
 
 const dynamoDB = new AWS.DynamoDB.DocumentClient();
 const s3 = new AWS.S3();
 
-function checkPrimaryKey(primaryKeyValue, loginToAccount) {
+function checkPrimaryKey(primaryKeyValue, login) {
     const params = {
         TableName: 'financial_assistant_gpt_db',
         Key: {
@@ -38,12 +38,23 @@ function checkPrimaryKey(primaryKeyValue, loginToAccount) {
 
                 if (data.Item['password'] === document.getElementById("password").value) {
                     console.log("Password matches.");
+                    console.log(data.Item)
                     const credentials = {
                         "email": data.Item['email'],
                         "company": data.Item['company'],
+                        "firstName": data.Item['firstName'],
+                        "lastName": data.Item['lastName'],
+                        "country": data.Item['country'],
+                        "city": data.Item['city'],
+                        "account_type": data.Item['account_type'],
+                        "bucket_name": data.Item['bucket_name'],
+                        "assistant_name": data.Item['assistant_name'],
+                        "assistant_id": data.Item['assistant_id']
                     }
 
-                    loginToAccount(credentials);
+                    console.log("credentialss: ", credentials);
+
+                    login(credentials);
                 } else {
                     console.log("Password does not match.");
                 }
@@ -122,6 +133,9 @@ const registerUser = async (userInfo, thisSetOpen) => {
     // here we want to create an S3 bucket for the user
     // add them to the dynamo DB table 
     console.log("yo")
+
+    userInfo["firstName"] = userInfo["firstName"].replace(/\s/g, "");
+    userInfo["lastName"] = userInfo["lastName"].replace(/\s/g, "");
     const response = await fetch('http://127.0.0.1:5000/sign-up', {
         method: 'POST',
         headers: {
@@ -161,7 +175,10 @@ const RegistrationForm = (thisSetOpen) => {
                 "company": document.getElementById("company-name").value,
                 "password": document.getElementById("signUpPassword").value,
                 "country": document.getElementById("country").value,
-                "city": document.getElementById("city").value
+                "city": document.getElementById("city").value,
+                "account_type": "free",
+                "bucket_name": document.getElementById("signUpEmail").value + "_bucket",
+                "assistant_name": document.getElementById("signUpEmail").value + "Financial Assistant"
             };
 
             // make a post request to the backend to add the user to the database
