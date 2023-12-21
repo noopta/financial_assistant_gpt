@@ -111,14 +111,14 @@ def uploadFilesToAssistant(input_assistant_id):
 
 
 
-def askAssistant(query, input_assistant_id):
+def askAssistant(query, input_assistant_id, fileList):
 
     print(query)
     print("*****")
     message = client.beta.threads.messages.create(
         thread_id=thread.id,
         role="user",
-        content="Use the myfiles_browser tool for the following query (if not possible then use code_intepreter and only send one resposne back. Wait until code_interpeter is done until you respond. Do not say anything like Let's start with the first file and then use another message to analyse the files): "+ query 
+        content= "Use the following files uploaded to you for your answer to the query and get your information from them primarily "  + fileList + " Use the myfiles_browser tool for the following query (if not possible then use code_intepreter and only send one resposne back. Wait until code_interpeter is done until you respond. Do not say anything like Let's start with the first file and then use another message to analyse the files): "+ query 
     )
 
     run = client.beta.threads.runs.create(
@@ -333,7 +333,7 @@ def handle_post():
     data = request.json
     print("Received dataa:", data)
 
-    response = askAssistant(data['text'], data['assistant_id'])
+    response = askAssistant(data['text'], data['assistant_id'], data['fileList'])
     print(response)
 
     return jsonify({"answer": response})
