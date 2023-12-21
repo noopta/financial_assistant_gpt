@@ -8,7 +8,8 @@ import {
     FireIcon,
     HandThumbUpIcon,
     HeartIcon,
-    MagnifyingGlassIcon
+    MagnifyingGlassIcon,
+    ExclamationTriangleIcon
 } from '@heroicons/react/20/solid';
 import AWS from 'aws-sdk';
 import * as pdfjsLib from 'pdfjs-dist/build/pdf';
@@ -74,8 +75,8 @@ export default function Chat() {
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
     const [text, setText] = useState('');
     const [faqs, setFaqs] = useState([]);
+    const [loginPrompt, setLoginPrompt] = useState(false);
     const { authUser, login, logout } = useAuth();
-
 
     const handleFileChange = (event) => {
         // Filter out non-PDF files
@@ -87,9 +88,10 @@ export default function Chat() {
     const [fileList, setFileList] = useState([]);
     const [selectedFiles, setSelectedFiles] = useState([]);
     const [isModalOpen, setModalOpen] = useState(false); // Use this state to control the modal
+    const [isUploadLoadingModalOpen, setIsUploadLoadingModalOpen] = useState(false);
 
     const handleUpload = async () => {
-
+        setIsUploadLoadingModalOpen(true);
         var numUploads = 0;
         const numFiles = selectedFiles.length;
         // make a copy of filelist and store it to a tempFileList 
@@ -174,6 +176,7 @@ export default function Chat() {
                 }
 
                 setFileList(tempList);
+                setIsUploadLoadingModalOpen(false);
             }).catch(error => {
                 console.error("Error occurred while uploading files", error);
                 // Handle any error that occurred during processing or uploading files
@@ -245,6 +248,10 @@ export default function Chat() {
         // gotta make the backend API call here
         // make program wait until the response is received
 
+        if (authUser == null) {
+            return "error";
+        }
+
         setModalOpen(true);
 
         var i = 0;
@@ -270,6 +277,7 @@ export default function Chat() {
         }]);
         console.log("yo")
 
+        return "sucess"
     }
 
     function InputTextBox(faqs, setFaqs, text, setText, isModalOpen, setModalOpen) {
@@ -283,7 +291,17 @@ export default function Chat() {
             <div style={{ paddingTop: '20px' }} className="flex items-start space-x-4 ">
 
                 <div className="min-w-0 flex-1">
-                    <form onSubmit={(e) => { e.preventDefault(); GenerateRow(faqs, setFaqs, text, isModalOpen, setModalOpen); }}>
+                    <form onSubmit={(e) => {
+                        e.preventDefault();
+                        GenerateRow(faqs, setFaqs, text, isModalOpen, setModalOpen).then((response) => {
+                            if (response == "error") {
+                                // then tell user to sign up
+                                setLoginPrompt(true);
+                            } else {
+                                setLoginPrompt(false);
+                            }
+                        });
+                    }}>
                         <div className="border-b dark:border-gray-200 focus-within:border-indigo-600 dark:border-gray-700 dark:focus-within:border-indigo-400">
                             <textarea
                                 rows={3}
@@ -292,7 +310,7 @@ export default function Chat() {
                                 onChange={handleTextChange}
                                 // className="block w-full resize-none border-0 border-b border-transparent p-0 pb-2 dark:text-gray-900 placeholder:dark:text-gray-400 focus:border-indigo-600 focus:ring-0 sm:text-sm sm:leading-6 dark:text-gray-200 dark:placeholder:text-gray-500 dark:focus:border-indigo-400"
                                 className="w-full border-0 bg-transparent pl-11 pr-4 text-white focus:ring-0 sm:text-sm textarea-focus-outline-none"
-                                placeholder="What are you curious about regarding your business financials?"
+                                placeholder="What are you curious about regarding your documents?"
                                 defaultValue={''}
                             />
                         </div>
@@ -422,10 +440,11 @@ export default function Chat() {
 
             </header>
             <div className="bg-gray-900 py-16 sm:py-24 lg:py-32">
+                <UploadLoadingModal isUploadLoadingModalOpen={isUploadLoadingModalOpen} setIsUploadLoadingModalOpen={setIsUploadLoadingModalOpen} />
                 <div className="mx-auto grid max-w-7xl grid-cols-1 gap-10 px-6 lg:grid-cols-12 lg:gap-8 lg:px-8">
                     <div className="max-w-xl text-3xl font-bold tracking-tight text-white sm:text-4xl lg:col-span-7">
-                        <h2 className="inline sm:block lg:inline xl:block">Ready to talk to your finances?</h2>{' '}
-                        <p className="inline sm:block lg:inline xl:block">Upload documents and get started.</p>
+                        <h2 className="inline sm:block lg:inline xl:block">Ready to talk to your documents?</h2>{' '}
+                        <p className="inline sm:block lg:inline xl:block">Upload PDF or TXT files and get started.</p>
                     </div>
                     <form className="w-full max-w-md lg:col-span-5 lg:pt-2" onSubmit={handleFormSubmit}>
                         <div className="flex gap-x-4">
@@ -474,6 +493,7 @@ export default function Chat() {
                 <div className="mx-auto max-w-7xl px-6 py-24 sm:py-32 lg:px-8 lg:py-40">
                     <div className="mx-auto max-w-4xl divide-y divide-white/10">
                         <h2 style={{ marginBottom: '20px' }} className="text-2xl font-bold leading-10 tracking-tight text-white">Your conversation</h2>
+                        {loginPrompt && LoginNotification()}
                         {InputTextBox(faqs, setFaqs, text, setText, isModalOpen, setModalOpen)}
                         <dl className="mt-10 space-y-6 divide-y divide-white/10">
                             {faqs.map((faq) => (
@@ -569,5 +589,85 @@ const LoadingModal = ({ openModal, setOpenModal }) => {
                 </div>
             </Dialog>
         </Transition.Root>
+    )
+}
+
+
+const UploadLoadingModal = ({ isUploadLoadingModalOpen, setIsUploadLoadingModalOpen }) => {
+    return (
+        <Transition.Root show={isUploadLoadingModalOpen} as={Fragment}>
+            <Dialog as="div" className="relative z-10" onClose={setIsUploadLoadingModalOpen}>
+                <Transition.Child
+                    as={Fragment}
+                    enter="ease-out duration-300"
+                    enterFrom="opacity-0"
+                    enterTo="opacity-100"
+                    leave="ease-in duration-200"
+                    leaveFrom="opacity-100"
+                    leaveTo="opacity-0"
+                >
+                    <div className="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" />
+                </Transition.Child>
+
+                <div className="fixed inset-0 z-10 w-screen overflow-y-auto">
+                    <div className="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0">
+                        <Transition.Child
+                            as={Fragment}
+                            enter="ease-out duration-300"
+                            enterFrom="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
+                            enterTo="opacity-100 translate-y-0 sm:scale-100"
+                            leave="ease-in duration-200"
+                            leaveFrom="opacity-100 translate-y-0 sm:scale-100"
+                            leaveTo="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
+                        >
+                            <Dialog.Panel className="relative transform overflow-hidden rounded-lg bg-white px-4 pb-4 pt-5 text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-sm sm:p-6">
+                                <div>
+                                    <div className="mx-auto flex h-12 w-12 items-center justify-center ">
+                                        <DotLoader color="#36d7b7" />
+                                    </div>
+                                    <div className="mt-3 text-center sm:mt-5">
+
+                                        <div className="mt-2">
+                                            <p className="text-sm text-gray-500">
+                                                Uploading documents, one sec!
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div className="mt-5 sm:mt-6">
+                                    <button
+                                        type="button"
+                                        className="inline-flex w-full justify-center rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+                                        onClick={() => setIsUploadLoadingModalOpen(false)}
+                                    >
+                                        Go back to dashboard
+                                    </button>
+                                </div>
+                            </Dialog.Panel>
+                        </Transition.Child>
+                    </div>
+                </div>
+            </Dialog>
+        </Transition.Root>
+    )
+}
+
+const LoginNotification = () => {
+    return (
+        <div className="border-l-4 border-yellow-400 bg-yellow-50 p-4">
+            <div className="flex">
+                <div className="flex-shrink-0">
+                    <ExclamationTriangleIcon className="h-5 w-5 text-yellow-400" aria-hidden="true" />
+                </div>
+                <div className="ml-3">
+                    <p className="text-sm text-yellow-700">
+                        You're not logged in!{' '}
+                        <a href="#" className="font-medium text-yellow-700 underline hover:text-yellow-600">
+                            <Link to="/Log In">Sign in to start talking to your documents.</Link>
+                        </a>
+                    </p>
+                </div>
+            </div>
+        </div>
     )
 }

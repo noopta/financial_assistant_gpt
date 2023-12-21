@@ -160,10 +160,10 @@ export default function Landing() {
                     <div className="mx-auto max-w-7xl px-6 lg:px-8">
                         <div className="mx-auto max-w-2xl text-center">
                             <h1 className="text-4xl font-bold tracking-tight text-white sm:text-6xl">
-                                Your personal financial analyst.
+                                Your personal document analyst and storage system.
                             </h1>
                             <p className="mt-6 text-lg leading-8 text-gray-300">
-                                Financial Insight is an interactive chatbot that helps you analyze and derive insights from financial documents such as earnings reports, balance sheets, and more.
+                                DocuSight is an interactive chatbot that helps you analyze, compare, contrast, and derive insights from querying agsint multiple documents such as textbooks, financial earnings, resumes, and more.
                             </p>
                             <div className="mt-10 flex items-center justify-center gap-x-6">
                                 <a
