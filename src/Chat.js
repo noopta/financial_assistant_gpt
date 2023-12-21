@@ -43,8 +43,15 @@ const moods = [
     { name: 'I feel nothing', value: null, icon: XMarkIcon, iconColor: 'text-gray-400', bgColor: 'bg-transparent' },
 ]
 
-const sendResponseToBackend = async (query, input_assistant_id) => {
+const sendResponseToBackend = async (query, input_assistant_id, selectedFiles) => {
     // send a request to our backend to retrieve the S3 files and run the GPT-4 model
+    var fileNames = "";
+    var i = 0;
+
+    for (i = 0; i < selectedFiles.length; i++) {
+        fileNames += selectedFiles[i]['fileName'] + ", "
+    }
+
     const response = await fetch('http://127.0.0.1:5000/post-endpoint', {
         method: 'POST',
         headers: {
@@ -53,6 +60,7 @@ const sendResponseToBackend = async (query, input_assistant_id) => {
         body: JSON.stringify({
             text: query,
             assistant_id: input_assistant_id,
+            fileList: fileNames
         }),
     });
 
@@ -153,10 +161,19 @@ export default function Chat() {
         Promise.all(promises).then(() => {
             // if (promises.length > 0) {
             console.log("All uploads completed");
-            // setFileList(tempFileList);
-            // setFileList(getFileListFromS3());
+
             uploadFilesToAssistant().then(newList => {
-                setFileList(newList);
+                var i = 0;
+                var tempList = [];
+
+                for (i = 0; i < newList.length; i++) {
+                    tempList.push({
+                        fileName: newList[i],
+                        selected: false
+                    })
+                }
+
+                setFileList(tempList);
             }).catch(error => {
                 console.error("Error occurred while uploading files", error);
                 // Handle any error that occurred during processing or uploading files
@@ -171,30 +188,6 @@ export default function Chat() {
             // Handle any error that occurred during processing or uploading files
         });
     };
-
-    const getFileListFromS3 = async () => {
-        const response = await fetch('http://127.0.0.1:5000/get-s3-files', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                bucket: authUser["firstName"] + authUser["lastName"] + "-bucket"
-            }),
-        });
-
-        const data = await response.json();
-        // const response = await fetch('http://127.0.0.1:5000/upload-files');
-
-        // const data = await response.json();
-
-        if (!data['result'] == "success") {
-            console.log("error")
-            return;
-        }
-
-        console.log(data); // { text: 'Hello, World!' }
-    }
 
     const uploadFilesToAssistant = async () => {
         // send a request to our backend to retrieve the S3 files and run the GPT-4 model
@@ -251,8 +244,15 @@ export default function Chat() {
     const GenerateRow = async (faqs, setFaqs, newRowQuestion, isModalOpen, setModalOpen) => {
         // gotta make the backend API call here
         // make program wait until the response is received
+
         setModalOpen(true);
-        const response = await sendResponseToBackend(newRowQuestion, authUser["assistant_id"]);
+
+        var i = 0;
+
+        // filter for files in fileList that have selected == true
+        let selectedFiles = fileList.filter(obj => obj.selected === true);
+
+        const response = await sendResponseToBackend(newRowQuestion, authUser["assistant_id"], selectedFiles);
         setModalOpen(false);
 
         function formatTextToHTML(text) {
@@ -322,12 +322,14 @@ export default function Chat() {
         event.preventDefault();
     };
 
-    const handleFileClick = (fileId) => {
+    const handleFileClick = (fileId, index) => {
         const svgElement = document.getElementById(fileId);
         if (svgElement) {
             if (svgElement.getAttribute("class") === "h-1.5 w-1.5 fill-green-400") {
+                fileList[index]['selected'] = false;
                 svgElement.setAttribute("class", "h-1.5 w-1.5 fill-indigo-400"); // Replace with your green fill class
             } else {
+                fileList[index]['selected'] = true;
                 svgElement.setAttribute("class", "h-1.5 w-1.5 fill-green-400");
             }
         }
@@ -458,11 +460,11 @@ export default function Chat() {
             </div>
             <span className="inline-flex items-center gap-x-1.5 rounded-md px-2 py-1 text-xs font-medium text-white ring-1 ring-inset ring-gray-800">
                 {fileList && fileList.length > 0 && fileList.map((file, index) => (
-                    <span onClick={() => handleFileClick(`svg-${index}`)} className="inline-flex items-center gap-x-1.5 rounded-md px-2 py-1 text-xs font-medium text-white ring-1 ring-inset ring-gray-800">
+                    <span onClick={() => handleFileClick(`svg-${index}`, index)} className="inline-flex items-center gap-x-1.5 rounded-md px-2 py-1 text-xs font-medium text-white ring-1 ring-inset ring-gray-800">
                         <svg id={`svg-${index}`} className="h-1.5 w-1.5 fill-indigo-400" viewBox="0 0 6 6" aria-hidden="true">
                             <circle cx={3} cy={3} r={3} />
                         </svg>
-                        {file}
+                        {file['fileName']}
                     </span>
                 ))}
             </span>
@@ -544,9 +546,6 @@ const LoadingModal = ({ openModal, setOpenModal }) => {
                                         <DotLoader color="#36d7b7" />
                                     </div>
                                     <div className="mt-3 text-center sm:mt-5">
-                                        {/* <Dialog.Title as="h3" className="text-base font-semibold leading-6 text-gray-900">
-                                            Payment successful
-                                        </Dialog.Title> */}
 
                                         <div className="mt-2">
                                             <p className="text-sm text-gray-500">
