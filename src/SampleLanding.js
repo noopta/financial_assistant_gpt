@@ -192,6 +192,12 @@ const handleSubscribe = async (e) => {
     console.log("sending email");
     var emailInput = document.getElementById("email-address").value;
 
+    AWS.config.update({
+        region: 'us-east-2',
+        accessKeyId: process.env.ACCESS_KEY,
+        secretAccessKey: process.env.SECRET_KEY
+    });
+
     const lambda = new AWS.Lambda();
 
     const params = {
