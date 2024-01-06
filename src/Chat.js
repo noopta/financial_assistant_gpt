@@ -31,8 +31,9 @@ const s3 = new AWS.S3();
 const navigation = [
     { name: 'Home', href: '#' },
     { name: 'Chat', href: '#' },
-    { name: 'Health Checker', href: '#' },
-    { name: 'Contact Us', href: '#' }
+    { name: 'Walkthrough', href: '#' },
+    // { name: 'Health Checker', href: '#' },
+    // { name: 'Contact Us', href: '#' }
 ]
 
 const moods = [
@@ -89,8 +90,19 @@ export default function Chat() {
     const [selectedFiles, setSelectedFiles] = useState([]);
     const [isModalOpen, setModalOpen] = useState(false); // Use this state to control the modal
     const [isUploadLoadingModalOpen, setIsUploadLoadingModalOpen] = useState(false);
+    const [uploadLoginPrompt, setUploadLoginPrompt] = useState(false);
 
     const handleUpload = async () => {
+
+        console.log("handleUpload");
+        if (authUser == null) {
+            setUploadLoginPrompt(true);
+            return;
+        } else {
+            setUploadLoginPrompt(false);
+        }
+
+
         setIsUploadLoadingModalOpen(true);
         var numUploads = 0;
         const numFiles = selectedFiles.length;
@@ -224,6 +236,9 @@ export default function Chat() {
 
         console.log("yoooooooo")
         console.log(bucketName)
+
+        // currently I'm sending via client side which will require CORS 
+        // if I send via backend then I can use the AWS SDK to send the data without CORS
 
         const params = {
             Bucket: bucketName,
@@ -467,6 +482,7 @@ export default function Chat() {
                                 Upload
                             </button>
                         </div>
+                        {uploadLoginPrompt && UploadLoginNotification()}
                         <p className="mt-4 text-sm leading-6 text-gray-300">
                             We care about your data. Read our{' '}
                             <a href="#" className="font-semibold text-white">
@@ -534,9 +550,11 @@ export default function Chat() {
 }
 
 const LoadingModal = ({ openModal, setOpenModal }) => {
+    const controller = new AbortController();
+
     return (
         <Transition.Root show={openModal} as={Fragment}>
-            <Dialog as="div" className="relative z-10" onClose={setOpenModal}>
+            <Dialog as="div" className="relative z-10" onClose={() => console.log("close")}>
                 <Transition.Child
                     as={Fragment}
                     enter="ease-out duration-300"
@@ -578,7 +596,10 @@ const LoadingModal = ({ openModal, setOpenModal }) => {
                                     <button
                                         type="button"
                                         className="inline-flex w-full justify-center rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
-                                        onClick={() => setOpenModal(false)}
+                                        onClick={() => {
+                                            controller.abort();
+                                            setOpenModal(false);
+                                        }}
                                     >
                                         Go back to dashboard
                                     </button>
@@ -594,9 +615,11 @@ const LoadingModal = ({ openModal, setOpenModal }) => {
 
 
 const UploadLoadingModal = ({ isUploadLoadingModalOpen, setIsUploadLoadingModalOpen }) => {
+    const controller = new AbortController();
+
     return (
         <Transition.Root show={isUploadLoadingModalOpen} as={Fragment}>
-            <Dialog as="div" className="relative z-10" onClose={setIsUploadLoadingModalOpen}>
+            <Dialog as="div" className="relative z-10" onClose={() => console.log("close")}>
                 <Transition.Child
                     as={Fragment}
                     enter="ease-out duration-300"
@@ -638,7 +661,11 @@ const UploadLoadingModal = ({ isUploadLoadingModalOpen, setIsUploadLoadingModalO
                                     <button
                                         type="button"
                                         className="inline-flex w-full justify-center rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
-                                        onClick={() => setIsUploadLoadingModalOpen(false)}
+                                        onClick={() => {
+                                            console.log("yo");
+                                            controller.abort();
+                                            setIsUploadLoadingModalOpen(false)
+                                        }}
                                     >
                                         Go back to dashboard
                                     </button>
@@ -664,6 +691,26 @@ const LoginNotification = () => {
                         You're not logged in!{' '}
                         <a href="#" className="font-medium text-yellow-700 underline hover:text-yellow-600">
                             <Link to="/Log In">Sign in to start talking to your documents.</Link>
+                        </a>
+                    </p>
+                </div>
+            </div>
+        </div>
+    )
+}
+
+const UploadLoginNotification = () => {
+    return (
+        <div className="border-l-4 border-yellow-400 bg-yellow-50 p-4">
+            <div className="flex">
+                <div className="flex-shrink-0">
+                    <ExclamationTriangleIcon className="h-5 w-5 text-yellow-400" aria-hidden="true" />
+                </div>
+                <div className="ml-3">
+                    <p className="text-sm text-yellow-700">
+                        You're not logged in!{' '}
+                        <a href="#" className="font-medium text-yellow-700 underline hover:text-yellow-600">
+                            <Link to="/Log In">Sign in to start uploading your documents.</Link>
                         </a>
                     </p>
                 </div>

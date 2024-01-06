@@ -7,15 +7,18 @@ import HealthChecker from './HealthChecker';
 import LogIn from './LogIn';
 import { AuthProvider } from './AuthProvider';
 import UserAuthentication from './UserAuthentication';
+import Walkthrough from './Walkthrough';
+import SampleLanding from './SampleLanding';
 
 function App() {
   return (
     <AuthProvider>
       <Router>
         <Routes>
-          <Route path="/" element={<Landing />} />
+          <Route path="/" element={<SampleLanding />} />
           <Route path="/Home" element={<Landing />} />
           <Route path="/Chat" element={<Chat />} />
+          <Route path="/Walkthrough" element={<Walkthrough />} />
           <Route path="/Health Checker" element={<HealthChecker />} />
           <Route path="/Log In" element={<UserAuthentication />} />
         </Routes>

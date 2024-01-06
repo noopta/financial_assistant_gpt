@@ -15,6 +15,7 @@ import AWS from 'aws-sdk';
 import './App.css'; // Make sure to include the CSS file in the same directory
 import { useAuth } from './AuthProvider';
 import { Link } from 'react-router-dom';
+import Testimonials from './Testimonials.js';
 
 pdfjsLib.GlobalWorkerOptions.workerSrc = process.env.PUBLIC_URL + '/pdf.worker.mjs';
 
@@ -29,8 +30,9 @@ const s3 = new AWS.S3();
 const navigation = [
     { name: 'Home', href: '#' },
     { name: 'Chat', href: '#' },
-    { name: 'Health Checker', href: '#' },
-    { name: 'Contact Us', href: '#' }
+    { name: 'Walkthrough', href: '#' },
+    // { name: 'Health Checker', href: '#' },
+    // { name: 'Contact Us', href: '#' }
 ]
 
 
@@ -160,7 +162,7 @@ export default function Landing() {
                     <div className="mx-auto max-w-7xl px-6 lg:px-8">
                         <div className="mx-auto max-w-2xl text-center">
                             <h1 className="text-4xl font-bold tracking-tight text-white sm:text-6xl">
-                                Your personal document analyst and storage system.
+                                Your document analyst and storage system.
                             </h1>
                             <p className="mt-6 text-lg leading-8 text-gray-300">
                                 DocuSight is an interactive chatbot that helps you analyze, compare, contrast, and derive insights from querying agsint multiple documents such as textbooks, financial earnings, resumes, and more.
@@ -173,7 +175,7 @@ export default function Landing() {
                                     <Link to="/Chat">Get started</Link>
                                 </a>
                                 <a href="#" className="text-sm font-semibold leading-6 text-white">
-                                    Learn more <span aria-hidden="true">→</span>
+                                    <Link to="/Walkthrough">Learn more <span aria-hidden="true">→</span></Link>
                                 </a>
                             </div>
                         </div>
@@ -191,6 +193,8 @@ export default function Landing() {
                             height={1442}
                             className="mt-16 rounded-md bg-white/5 shadow-2xl ring-1 ring-white/10 sm:mt-24"
                         /> */}
+
+                        <Testimonials />
                     </div>
                 </div>
             </div>

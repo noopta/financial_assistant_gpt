@@ -8,7 +8,8 @@ import {
     FireIcon,
     HandThumbUpIcon,
     HeartIcon,
-    MagnifyingGlassIcon
+    MagnifyingGlassIcon,
+    ExclamationTriangleIcon
 } from '@heroicons/react/20/solid';
 import AWS from 'aws-sdk';
 import * as pdfjsLib from 'pdfjs-dist/build/pdf';
@@ -44,8 +45,8 @@ function checkPrimaryKey(primaryKeyValue, login) {
                         "company": data.Item['company'],
                         "firstName": data.Item['firstName'],
                         "lastName": data.Item['lastName'],
-                        "country": data.Item['country'],
-                        "city": data.Item['city'],
+                        // "country": data.Item['country'],
+                        // "city": data.Item['city'],
                         "account_type": data.Item['account_type'],
                         "bucket_name": data.Item['bucket_name'],
                         "assistant_name": data.Item['assistant_name'],
@@ -73,8 +74,8 @@ const addUserToDynamoDB = async (userInfo) => {
             "lastName": userInfo.lastName,
             "company": userInfo.company,
             "password": userInfo.password,
-            "country": userInfo.country,
-            "city": userInfo.city
+            // "country": userInfo.country,
+            // "city": userInfo.city
         }
     };
 
@@ -164,231 +165,43 @@ const registerUser = async (userInfo, thisSetOpen) => {
     // for health checker files
 }
 
-const RegistrationForm = (thisSetOpen) => {
-    return (
-        <form onSubmit={(e) => {
-            e.preventDefault();
-            var userInfo = {
-                "email": document.getElementById("signUpEmail").value,
-                "firstName": document.getElementById("first-name").value,
-                "lastName": document.getElementById("last-name").value,
-                "company": document.getElementById("company-name").value,
-                "password": document.getElementById("signUpPassword").value,
-                "country": document.getElementById("country").value,
-                "city": document.getElementById("city").value,
-                "account_type": "free",
-                "bucket_name": document.getElementById("signUpEmail").value + "_bucket",
-                "assistant_name": document.getElementById("signUpEmail").value + "Financial Assistant"
-            };
+const checkInfoValidity = (userInfo) => {
+    if (userInfo['firstName'].length == 0) {
+        return "empty first name";
+    }
 
-            // make a post request to the backend to add the user to the database
+    if (userInfo['lastName'].length == 0) {
+        return "empty last name";
+    }
 
-            registerUser(userInfo, thisSetOpen);
-        }}>
-            <div className="space-y-12">
+    if (userInfo['email'].length == 0) {
+        return "empty email";
+    }
 
-                <div className="border-b border-white/10 pb-12">
-                    <h2 className="text-base font-semibold leading-7 text-white">Personal Information</h2>
-                    <p className="mt-1 text-sm leading-6 text-gray-400">Use a permanent address where you can receive mail.</p>
+    if (!userInfo['email'].includes('@')) {
+        return "invalid email";
+    }
 
-                    <div className="mt-10 grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6">
-                        <div className="sm:col-span-3">
-                            <label htmlFor="first-name" className="block text-sm font-medium leading-6 text-white">
-                                First name
-                            </label>
-                            <div className="mt-2">
-                                <input
-                                    type="text"
-                                    name="first-name"
-                                    id="first-name"
-                                    autoComplete="given-name"
-                                    className="block w-full rounded-md border-0 bg-white/5 py-1.5 text-white shadow-sm ring-1 ring-inset ring-white/10 focus:ring-2 focus:ring-inset focus:ring-indigo-500 sm:text-sm sm:leading-6"
-                                />
-                            </div>
-                        </div>
+    if (userInfo['password'].length == 0) {
+        return "empty password";
+    }
 
-                        <div className="sm:col-span-3">
-                            <label htmlFor="last-name" className="block text-sm font-medium leading-6 text-white">
-                                Last name
-                            </label>
-                            <div className="mt-2">
-                                <input
-                                    type="text"
-                                    name="last-name"
-                                    id="last-name"
-                                    autoComplete="family-name"
-                                    className="block w-full rounded-md border-0 bg-white/5 py-1.5 text-white shadow-sm ring-1 ring-inset ring-white/10 focus:ring-2 focus:ring-inset focus:ring-indigo-500 sm:text-sm sm:leading-6"
-                                />
-                            </div>
-                        </div>
+    if (userInfo['password'].length < 8) {
+        return "invalid password length";
+    }
 
-                        <div className="sm:col-span-4">
-                            <label htmlFor="email" className="block text-sm font-medium leading-6 text-white">
-                                Email address
-                            </label>
-                            <div className="mt-2">
-                                <input
-                                    id="signUpEmail"
-                                    name="email"
-                                    type="email"
-                                    autoComplete="email"
-                                    className="block w-full rounded-md border-0 bg-white/5 py-1.5 text-white shadow-sm ring-1 ring-inset ring-white/10 focus:ring-2 focus:ring-inset focus:ring-indigo-500 sm:text-sm sm:leading-6"
-                                />
-                            </div>
-                        </div>
+    if (userInfo['password'] != userInfo['retypePassword']) {
+        return "unmatching passwords";
+    }
 
-                        <div className="sm:col-span-2">
-                            <label htmlFor="postal-code" className="block text-sm font-medium leading-6 text-white">
-                                Company Name
-                            </label>
-                            <div className="mt-2">
-                                <input
-                                    type="text"
-                                    name="company-name"
-                                    id="company-name"
-                                    autoComplete="text"
-                                    className="block w-full rounded-md border-0 bg-white/5 py-1.5 text-white shadow-sm ring-1 ring-inset ring-white/10 focus:ring-2 focus:ring-inset focus:ring-indigo-500 sm:text-sm sm:leading-6"
-                                />
-                            </div>
-                        </div>
-
-                        <div className="sm:col-span-3">
-                            <label htmlFor="first-name" className="block text-sm font-medium leading-6 text-white">
-                                Password
-                            </label>
-                            <div className="mt-2">
-                                <input
-                                    type="password"
-                                    name="first-name"
-                                    id="signUpPassword"
-                                    autoComplete="password"
-                                    className="block w-full rounded-md border-0 bg-white/5 py-1.5 text-white shadow-sm ring-1 ring-inset ring-white/10 focus:ring-2 focus:ring-inset focus:ring-indigo-500 sm:text-sm sm:leading-6"
-                                />
-                            </div>
-                        </div>
-
-                        <div className="sm:col-span-3">
-                            <label htmlFor="last-name" className="block text-sm font-medium leading-6 text-white">
-                                Re-type Password
-                            </label>
-                            <div className="mt-2">
-                                <input
-                                    type="password"
-                                    name="password"
-                                    id="retypePassword"
-                                    autoComplete="password"
-                                    className="block w-full rounded-md border-0 bg-white/5 py-1.5 text-white shadow-sm ring-1 ring-inset ring-white/10 focus:ring-2 focus:ring-inset focus:ring-indigo-500 sm:text-sm sm:leading-6"
-                                />
-                            </div>
-                        </div>
-
-                        <div className="sm:col-span-3">
-                            <label htmlFor="country" className="block text-sm font-medium leading-6 text-white">
-                                Country
-                            </label>
-                            <div className="mt-2">
-                                <input
-                                    type="text"
-                                    name="country"
-                                    id="country"
-                                    autoComplete="address-level2"
-                                    className="block w-full rounded-md border-0 bg-white/5 py-1.5 text-white shadow-sm ring-1 ring-inset ring-white/10 focus:ring-2 focus:ring-inset focus:ring-indigo-500 sm:text-sm sm:leading-6"
-                                />
-                            </div>
-                        </div>
-
-                        <div className="sm:col-span-3">
-                            <label htmlFor="city" className="block text-sm font-medium leading-6 text-white">
-                                City
-                            </label>
-                            <div className="mt-2">
-                                <input
-                                    type="text"
-                                    name="city"
-                                    id="city"
-                                    autoComplete="address-level2"
-                                    className="block w-full rounded-md border-0 bg-white/5 py-1.5 text-white shadow-sm ring-1 ring-inset ring-white/10 focus:ring-2 focus:ring-inset focus:ring-indigo-500 sm:text-sm sm:leading-6"
-                                />
-                            </div>
-                        </div>
-
-                    </div>
-                </div>
-            </div>
-
-            <div className="mt-6 flex items-center justify-end gap-x-6">
-                <button type="button" className="text-sm font-semibold leading-6 text-white">
-                    Cancel
-                </button>
-                <button
-                    type="submit"
-                    className="rounded-md bg-indigo-500 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500"
-                >
-                    Sign up
-                </button>
-            </div>
-        </form>
-    );
+    return "success";
 }
 
 const navigation = [
     { name: 'Home', href: '#' },
     { name: 'Chat', href: '#' },
-    { name: 'Health Checker', href: '#' },
-    { name: 'Contact Us', href: '#' }
+    { name: 'Walkthrough', href: '#' }
 ]
-
-const SignUp = ({ thisOpen, thisSetOpen }) => {
-    // const [thisOpen, thisSetOpen] = useState(false);
-    const thisCancelButtonRef = useRef(null);
-
-    const handleClick = () => {
-        thisSetOpen(false);
-        // setParentOpen(false);
-    }
-    return (
-        <Transition.Root show={thisOpen} as={Fragment}>
-            <Dialog as="div" className="relative z-10" initialFocus={thisCancelButtonRef} onClose={thisSetOpen}>
-                <Transition.Child
-                    as="div"
-                    enter="ease-out duration-300"
-                    enterFrom="opacity-0"
-                    enterTo="opacity-100"
-                    leave="ease-in duration-200"
-                    leaveFrom="opacity-100"
-                    leaveTo="opacity-0"
-                >
-                    <div className="fixed inset-0 bg-black bg-opacity-75 transition-opacity" /> {/* Dark Background */}
-                </Transition.Child>
-
-                <div className="fixed inset-0 z-10 w-screen overflow-y-auto">
-                    <div className="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0">
-                        <Transition.Child
-                            as="div"
-                            enter="ease-out duration-300"
-                            enterFrom="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
-                            enterTo="opacity-100 translate-y-0 sm:scale-100"
-                            leave="ease-in duration-200"
-                            leaveFrom="opacity-100 translate-y-0 sm:scale-100"
-                            leaveTo="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
-                        >
-                            <Dialog.Panel className="relative transform overflow-hidden rounded-lg bg-gray-800 px-4 pb-4 pt-5 text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg sm:p-6"> {/* Dark Panel */}
-                                <div>
-
-                                    <div className="mt-3 text-center sm:mt-5">
-                                        <div className="mt-2">
-                                            {RegistrationForm(thisSetOpen)} {/* Ensure RegistrationForm also supports dark mode */}
-                                        </div>
-                                    </div>
-                                </div>
-                            </Dialog.Panel>
-                        </Transition.Child>
-                    </div>
-                </div>
-            </Dialog>
-        </Transition.Root>
-    )
-}
 
 
 
@@ -398,15 +211,284 @@ export default function LogIn() {
     const cancelButtonRef = useRef(null)
     const [open, setOpen] = useState(false);
     const [thisOpen, setThisOpen] = useState(false);
+    const [signUpError, setSignUpError] = useState(false);
+    const [signUpErrorMessage, setSignUpErrorMessage] = useState("");
 
     const handleSubmit = (event) => {
         console.log("yo");
 
         checkPrimaryKey(event.target.email.value, login);
     }
+
+    const LoginFormErrorNotification = () => {
+        return (
+            <div className="border-l-4 border-yellow-400 bg-yellow-50 p-4">
+                <div className="flex">
+                    <div className="flex-shrink-0">
+                        <ExclamationTriangleIcon className="h-5 w-5 text-yellow-400" aria-hidden="true" />
+                    </div>
+                    <div className="ml-3">
+                        <p className="text-sm text-yellow-700">
+                            Whoops!{' '}
+                            <a href="#" className="font-medium text-yellow-700 underline hover:text-yellow-600">
+                                {signUpErrorMessage}
+                            </a>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        )
+    }
+
+    const RegistrationForm = (thisSetOpen) => {
+        let errorMap = new Map();
+
+        errorMap['empty email'] = 'Please enter an email.';
+        errorMap['empty first name'] = 'Please enter your first name';
+        errorMap['empty last name'] = 'Please enter your last name';
+        errorMap['invalid email'] = 'Please enter a valid email address';
+        errorMap['empty password'] = 'Please enter a password';
+        errorMap['invalid password length'] = 'Please enter a password with >= 8 characters.';
+        errorMap['umatching passwords'] = 'Please enter matching passwords';
+
+        return (
+            <form onSubmit={(e) => {
+                e.preventDefault();
+                console.log("at form submit");
+                var userInfo = {
+                    "email": document.getElementById("signUpEmail").value,
+                    "firstName": document.getElementById("first-name").value,
+                    "lastName": document.getElementById("last-name").value,
+                    "company": document.getElementById("company-name").value,
+                    "password": document.getElementById("signUpPassword").value,
+                    "retypePassword": document.getElementById("retypePassword").value,
+                    // "country": document.getElementById("country").value,
+                    // "city": document.getElementById("city").value,
+                    "account_type": "free",
+                    "bucket_name": document.getElementById("signUpEmail").value + "_bucket",
+                    "assistant_name": document.getElementById("signUpEmail").value + "Financial Assistant"
+                };
+
+                let formValidityResponse = checkInfoValidity(userInfo);
+
+                console.log(formValidityResponse);
+                console.log(errorMap);
+
+                if (formValidityResponse != "success") {
+                    let errorMessage = errorMap[formValidityResponse];
+                    setSignUpErrorMessage(errorMessage);
+                    setSignUpError(true);
+
+                    console.log(errorMessage);
+                    return errorMessage;
+                }
+
+                // make a post request to the backend to add the user to the database
+
+                registerUser(userInfo, thisSetOpen);
+            }}>
+                <div className="space-y-12">
+                    <div className="border-b border-white/10 pb-12">
+                        <h2 className="text-base font-semibold leading-7 text-white">Personal Information</h2>
+                        <p className="mt-1 text-sm leading-6 text-gray-400">Use a permanent address where you can receive mail.</p>
+                        {signUpError && LoginFormErrorNotification()}
+                        <div className="mt-10 grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6">
+                            <div className="sm:col-span-3">
+                                <label htmlFor="first-name" className="block text-sm font-medium leading-6 text-white">
+                                    First name
+                                </label>
+                                <div className="mt-2">
+                                    <input
+                                        type="text"
+                                        name="first-name"
+                                        id="first-name"
+                                        autoComplete="given-name"
+                                        className="block w-full rounded-md border-0 bg-white/5 py-1.5 text-white shadow-sm ring-1 ring-inset ring-white/10 focus:ring-2 focus:ring-inset focus:ring-indigo-500 sm:text-sm sm:leading-6"
+                                    />
+                                </div>
+                            </div>
+
+                            <div className="sm:col-span-3">
+                                <label htmlFor="last-name" className="block text-sm font-medium leading-6 text-white">
+                                    Last name
+                                </label>
+                                <div className="mt-2">
+                                    <input
+                                        type="text"
+                                        name="last-name"
+                                        id="last-name"
+                                        autoComplete="family-name"
+                                        className="block w-full rounded-md border-0 bg-white/5 py-1.5 text-white shadow-sm ring-1 ring-inset ring-white/10 focus:ring-2 focus:ring-inset focus:ring-indigo-500 sm:text-sm sm:leading-6"
+                                    />
+                                </div>
+                            </div>
+
+                            <div className="sm:col-span-4">
+                                <label htmlFor="email" className="block text-sm font-medium leading-6 text-white">
+                                    Email address
+                                </label>
+                                <div className="mt-2">
+                                    <input
+                                        id="signUpEmail"
+                                        name="email"
+                                        type="email"
+                                        autoComplete="email"
+                                        className="block w-full rounded-md border-0 bg-white/5 py-1.5 text-white shadow-sm ring-1 ring-inset ring-white/10 focus:ring-2 focus:ring-inset focus:ring-indigo-500 sm:text-sm sm:leading-6"
+                                    />
+                                </div>
+                            </div>
+
+                            <div className="sm:col-span-2">
+                                <label htmlFor="postal-code" className="block text-sm font-medium leading-6 text-white">
+                                    Company Name
+                                </label>
+                                <div className="mt-2">
+                                    <input
+                                        type="text"
+                                        name="company-name"
+                                        id="company-name"
+                                        autoComplete="text"
+                                        className="block w-full rounded-md border-0 bg-white/5 py-1.5 text-white shadow-sm ring-1 ring-inset ring-white/10 focus:ring-2 focus:ring-inset focus:ring-indigo-500 sm:text-sm sm:leading-6"
+                                    />
+                                </div>
+                            </div>
+
+                            <div className="sm:col-span-3">
+                                <label htmlFor="first-name" className="block text-sm font-medium leading-6 text-white">
+                                    Password
+                                </label>
+                                <div className="mt-2">
+                                    <input
+                                        type="password"
+                                        name="first-name"
+                                        id="signUpPassword"
+                                        autoComplete="password"
+                                        className="block w-full rounded-md border-0 bg-white/5 py-1.5 text-white shadow-sm ring-1 ring-inset ring-white/10 focus:ring-2 focus:ring-inset focus:ring-indigo-500 sm:text-sm sm:leading-6"
+                                    />
+                                </div>
+                            </div>
+
+                            <div className="sm:col-span-3">
+                                <label htmlFor="last-name" className="block text-sm font-medium leading-6 text-white">
+                                    Re-type Password
+                                </label>
+                                <div className="mt-2">
+                                    <input
+                                        type="password"
+                                        name="password"
+                                        id="retypePassword"
+                                        autoComplete="password"
+                                        className="block w-full rounded-md border-0 bg-white/5 py-1.5 text-white shadow-sm ring-1 ring-inset ring-white/10 focus:ring-2 focus:ring-inset focus:ring-indigo-500 sm:text-sm sm:leading-6"
+                                    />
+                                </div>
+                            </div>
+
+                            {/* <div className="sm:col-span-3">
+                                <label htmlFor="country" className="block text-sm font-medium leading-6 text-white">
+                                    Country
+                                </label>
+                                <div className="mt-2">
+                                    <input
+                                        type="text"
+                                        name="country"
+                                        id="country"
+                                        autoComplete="address-level2"
+                                        className="block w-full rounded-md border-0 bg-white/5 py-1.5 text-white shadow-sm ring-1 ring-inset ring-white/10 focus:ring-2 focus:ring-inset focus:ring-indigo-500 sm:text-sm sm:leading-6"
+                                    />
+                                </div>
+                            </div>
+    
+                            <div className="sm:col-span-3">
+                                <label htmlFor="city" className="block text-sm font-medium leading-6 text-white">
+                                    City
+                                </label>
+                                <div className="mt-2">
+                                    <input
+                                        type="text"
+                                        name="city"
+                                        id="city"
+                                        autoComplete="address-level2"
+                                        className="block w-full rounded-md border-0 bg-white/5 py-1.5 text-white shadow-sm ring-1 ring-inset ring-white/10 focus:ring-2 focus:ring-inset focus:ring-indigo-500 sm:text-sm sm:leading-6"
+                                    />
+                                </div>
+                            </div> */}
+
+                        </div>
+                    </div>
+                </div>
+
+                <div className="mt-6 flex items-center justify-end gap-x-6">
+                    <button type="button" className="text-sm font-semibold leading-6 text-white">
+                        Cancel
+                    </button>
+                    <button
+                        type="submit"
+                        className="rounded-md bg-indigo-500 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500"
+                    >
+                        Sign up
+                    </button>
+                </div>
+            </form>
+        );
+    }
+
+    const SignUp = ({ thisOpen, thisSetOpen }) => {
+        // const [thisOpen, thisSetOpen] = useState(false);
+        const thisCancelButtonRef = useRef(null);
+
+        const handleClick = () => {
+            thisSetOpen(false);
+            // setParentOpen(false);
+        }
+        return (
+            <Transition.Root show={thisOpen} as={Fragment}>
+                <Dialog as="div" className="relative z-[60]" initialFocus={thisCancelButtonRef} onClose={thisSetOpen}>
+                    <Transition.Child
+                        as="div"
+                        enter="ease-out duration-300"
+                        enterFrom="opacity-0"
+                        enterTo="opacity-100"
+                        leave="ease-in duration-200"
+                        leaveFrom="opacity-100"
+                        leaveTo="opacity-0"
+                    >
+                        <div className="fixed inset-0 bg-black bg-opacity-75 transition-opacity" /> {/* Dark Background */}
+                    </Transition.Child>
+
+                    <div className="fixed inset-0 z-10 w-screen overflow-y-auto">
+                        <div className="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0">
+                            <Transition.Child
+                                as="div"
+                                enter="ease-out duration-300"
+                                enterFrom="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
+                                enterTo="opacity-100 translate-y-0 sm:scale-100"
+                                leave="ease-in duration-200"
+                                leaveFrom="opacity-100 translate-y-0 sm:scale-100"
+                                leaveTo="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
+                            >
+                                <Dialog.Panel className="relative transform overflow-hidden rounded-lg bg-gray-800 px-4 pb-4 pt-5 text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg sm:p-6"> {/* Dark Panel */}
+                                    <div>
+
+                                        <div className="mt-3 text-center sm:mt-5">
+                                            <div className="mt-2">
+                                                {RegistrationForm(thisSetOpen)} {/* Ensure RegistrationForm also supports dark mode */}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </Dialog.Panel>
+                            </Transition.Child>
+                        </div>
+                    </div>
+                </Dialog>
+            </Transition.Root>
+        )
+    }
+
     return (
         <>
             <div className="bg-gray-900 px-6 py-24 lg:px-8">
+                {thisOpen && <SignUp thisOpen={thisOpen} thisSetOpen={setThisOpen} />}
+
                 <header className="absolute inset-x-0 top-0 z-50">
                     <nav className="flex items-center justify-between p-6 lg:px-8" aria-label="Global">
                         <div className="flex lg:flex-1">
@@ -567,8 +649,6 @@ export default function LogIn() {
                         </p>
                     </div>
                 </div>
-
-                {thisOpen && <SignUp thisOpen={thisOpen} thisSetOpen={setThisOpen} />}
             </div>
         </>
     )

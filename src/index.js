@@ -4,6 +4,7 @@ import './index.css';
 import Landing from './Landing';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
+import SampleLanding from './SampleLanding';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
