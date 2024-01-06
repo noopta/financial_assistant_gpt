@@ -192,12 +192,6 @@ const handleSubscribe = async (e) => {
     console.log("sending email");
     var emailInput = document.getElementById("email-address").value;
 
-    AWS.config.update({
-        region: 'us-east-2',
-        accessKeyId: process.env.ACCESS_KEY,
-        secretAccessKey: process.env.SECRET_KEY
-    });
-
     const lambda = new AWS.Lambda();
 
     const params = {
@@ -216,6 +210,11 @@ const handleSubscribe = async (e) => {
 }
 
 const Newsletter = () => {
+    AWS.config.update({
+        region: 'us-east-2',
+        accessKeyId: process.env.REACT_APP_ACCESS_KEY,
+        secretAccessKey: process.env.REACT_APP_SECRET_KEY
+    });
     return (
         <div className="bg-white py-16 ">
             <div className="mx-auto grid max-w-7xl grid-cols-1 gap-10 px-6 lg:grid-cols-12 lg:gap-8 lg:px-8">
