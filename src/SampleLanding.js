@@ -1,5 +1,6 @@
-import { useState } from 'react'
-import { Dialog } from '@headlessui/react'
+import { useState, React, useRef, Fragment } from 'react'
+import { Dialog, Transition } from '@headlessui/react'
+import { DotLoader } from "react-spinners";
 import {
     ArrowPathIcon,
     Bars3Icon,
@@ -186,79 +187,152 @@ function classNames(...classes) {
 const sendEmail = async (email) => {
 };
 
-const handleSubscribe = async (e) => {
-    e.preventDefault();
-    //  prevent default
-    console.log("sending email");
-    var emailInput = document.getElementById("email-address").value;
 
-    const lambda = new AWS.Lambda();
+export default function SampleLanding() {
+    const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+    const getStartedRef = useRef(null);
+    const learnMoreRef = useRef(null);
+    const scrollToSubcribe = () => getStartedRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    const scrollToLearnMore = () => learnMoreRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    const [openModal, setOpenModal] = useState(false);
 
-    const params = {
-        FunctionName: 'twilioTextWithEmailLambda',
-        InvocationType: 'RequestResponse', // 'Event' for async
-        Payload: JSON.stringify({ email: emailInput }) // Your payload here
-    };
-
-    lambda.invoke(params, (err, data) => {
-        if (err) {
-            console.error(err);
-        } else {
-            console.log('text sent');
-        }
-    });
-}
-
-const Newsletter = () => {
     AWS.config.update({
         region: 'us-east-2',
         accessKeyId: process.env.REACT_APP_ACCESS_KEY,
         secretAccessKey: process.env.REACT_APP_SECRET_KEY
     });
-    return (
-        <div className="bg-white py-16 ">
-            <div className="mx-auto grid max-w-7xl grid-cols-1 gap-10 px-6 lg:grid-cols-12 lg:gap-8 lg:px-8">
-                <div className="max-w-xl text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl lg:col-span-7">
-                    <h2 className="inline sm:block lg:inline xl:block">Sound like a match for you?</h2>{' '}
-                    <p className="inline sm:block lg:inline xl:block">Sign up for early access.</p>
-                </div>
-                <form className="w-full max-w-md lg:col-span-5 lg:pt-2" onSubmit={handleSubscribe}>
-                    <div className="flex gap-x-4">
-                        <label htmlFor="email-address" className="sr-only">
-                            Email address
-                        </label>
-                        <input
-                            id="email-address"
-                            name="email"
-                            type="email"
-                            autoComplete="email"
-                            required
-                            className="min-w-0 flex-auto rounded-md border-0 px-3.5 py-2 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-                            placeholder="Enter your email"
-                        />
-                        <button
-                            type="submit"
-                            className="flex-none rounded-md bg-indigo-600 px-3.5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
-                        >
-                            Subscribe
-                        </button>
+
+    const handleSubscribe = async (e) => {
+        e.preventDefault();
+        //  prevent default
+        var emailInput = document.getElementById("email-address").value;
+
+        const lambda = new AWS.Lambda();
+
+        const params = {
+            FunctionName: 'twilioTextWithEmailLambda',
+            InvocationType: 'RequestResponse', // 'Event' for async
+            Payload: JSON.stringify({ email: emailInput }) // Your payload here
+        };
+
+        lambda.invoke(params, (err, data) => {
+            if (err) {
+                console.error(err);
+            } else {
+                setOpenModal(true);
+            }
+        });
+    }
+
+    const LoadingModal = () => {
+        const controller = new AbortController();
+
+        return (
+            <Transition.Root show={openModal} as={Fragment}>
+                <Dialog as="div" className="relative z-10" onClose={() => console.log("close")}>
+                    <Transition.Child
+                        as={Fragment}
+                        enter="ease-out duration-300"
+                        enterFrom="opacity-0"
+                        enterTo="opacity-100"
+                        leave="ease-in duration-200"
+                        leaveFrom="opacity-100"
+                        leaveTo="opacity-0"
+                    >
+                        <div className="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" />
+                    </Transition.Child>
+
+                    <div className="fixed inset-0 z-10 w-screen overflow-y-auto">
+                        <div className="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0">
+                            <Transition.Child
+                                as={Fragment}
+                                enter="ease-out duration-300"
+                                enterFrom="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
+                                enterTo="opacity-100 translate-y-0 sm:scale-100"
+                                leave="ease-in duration-200"
+                                leaveFrom="opacity-100 translate-y-0 sm:scale-100"
+                                leaveTo="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
+                            >
+                                <Dialog.Panel className="relative transform overflow-hidden rounded-lg bg-white px-4 pb-4 pt-5 text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-sm sm:p-6">
+                                    <div>
+                                        <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-green-100">
+                                            <CheckIcon className="h-6 w-6 text-green-600" aria-hidden="true" />
+                                        </div>
+                                        <div className="mt-3 text-center sm:mt-5">
+                                            <Dialog.Title as="h3" className="text-base font-semibold leading-6 text-gray-900">
+                                                Congratulations, you're subscribed!
+                                            </Dialog.Title>
+                                            <div className="mt-2">
+                                                <p className="text-sm text-gray-500">
+                                                    You'll receive a confirmation email from us within 1-2 business days, and we'll keep you updated for when we launch.
+                                                </p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div className="mt-5 sm:mt-6">
+                                        <button
+                                            type="button"
+                                            className="inline-flex w-full justify-center rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+                                            onClick={() => {
+                                                controller.abort();
+                                                setOpenModal(false);
+                                            }}
+                                        >
+                                            Go back to landing page
+                                        </button>
+                                    </div>
+                                </Dialog.Panel>
+                            </Transition.Child>
+                        </div>
                     </div>
-                    <p className="mt-4 text-sm leading-6 text-gray-900">
-                        We care about your data. Read our{' '}
-                        <a href="#" className="font-semibold text-indigo-600 hover:text-indigo-500">
-                            privacy&nbsp;policy
-                        </a>
-                        .
-                    </p>
-                </form>
+                </Dialog>
+            </Transition.Root>
+        )
+    }
+
+    const Newsletter = () => {
+        return (
+            <div ref={getStartedRef} className="bg-white py-16 ">
+                {openModal && LoadingModal()}
+                <div className="mx-auto grid max-w-7xl grid-cols-1 gap-10 px-6 lg:grid-cols-12 lg:gap-8 lg:px-8">
+                    <div className="max-w-xl text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl lg:col-span-7">
+                        <h2 className="inline sm:block lg:inline xl:block">Interested in trying it out?</h2>{' '}
+                        <p className="inline sm:block lg:inline xl:block">Subscribe up for early access.</p>
+                    </div>
+                    <form className="w-full max-w-md lg:col-span-5 lg:pt-2" onSubmit={handleSubscribe}>
+                        <div className="flex gap-x-4">
+                            <label htmlFor="email-address" className="sr-only">
+                                Email address
+                            </label>
+                            <input
+                                id="email-address"
+                                name="email"
+                                type="email"
+                                autoComplete="email"
+                                required
+                                className="min-w-0 flex-auto rounded-md border-0 px-3.5 py-2 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                                placeholder="Enter your email"
+                            />
+                            <button
+                                type="submit"
+                                className="flex-none rounded-md bg-indigo-600 px-3.5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+                            >
+                                Subscribe
+                            </button>
+                        </div>
+                        <p className="mt-4 text-sm leading-6 text-gray-900">
+                            We care about your data. Read our{' '}
+                            <a href="#" className="font-semibold text-indigo-600 hover:text-indigo-500">
+                                privacy&nbsp;policy
+                            </a>
+                            .
+                        </p>
+                    </form>
+                </div>
             </div>
-        </div>
-    )
-}
+        )
+    }
 
-
-export default function SampleLanding() {
-    const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
 
     return (
         <div className="bg-white">
@@ -371,15 +445,18 @@ export default function SampleLanding() {
                                     Cross reference documents, find overlapping info, and more through a simple chat interface allowing you to talk to the files directly. Select and deselect documents you care to talk to, and have them saved to your account for future reference.
                                 </p>
                                 <div className="mt-10 flex items-center justify-center gap-x-6">
-                                    <a
-                                        href="#"
+                                    <button
+                                        onClick={scrollToSubcribe}
                                         className="rounded-md bg-indigo-600 px-3.5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
                                     >
-                                        Get started
-                                    </a>
-                                    <a href="#" className="text-sm font-semibold leading-6 text-gray-900">
+                                        Get notified for when we launch
+                                    </button>
+                                    <button
+                                        onClick={scrollToLearnMore}
+                                        className="text-sm font-semibold leading-6 text-gray-900"
+                                    >
                                         Learn more <span aria-hidden="true">→</span>
-                                    </a>
+                                    </button>
                                 </div>
                             </div>
                             <div className="mt-16 flow-root sm:mt-24">
@@ -410,7 +487,7 @@ export default function SampleLanding() {
                 </div>
 
                 {/* Feature section */}
-                <div className="mx-auto max-w-7xl px-6 lg:px-8">
+                <div ref={learnMoreRef} className="mx-auto max-w-7xl px-6 lg:px-8">
                     <div className="mx-auto max-w-2xl lg:text-center">
                         <h2 className="text-base font-semibold leading-7 text-indigo-600">Access files efficiently</h2>
                         <p className="mt-2 text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">
@@ -478,7 +555,7 @@ export default function SampleLanding() {
                                     </p>
                                 </blockquote>
                                 <figcaption className="mt-6 text-base text-white">
-                                    <div className="font-semibold">Victor Rusu</div>
+                                    <div className="font-semibold">Victor R.</div>
                                     <div className="mt-1">Harvard Medical School Graduate, M.D.</div>
                                 </figcaption>
                             </figure>
