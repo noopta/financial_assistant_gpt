@@ -2,15 +2,12 @@ import { useState, React, useRef, Fragment } from 'react'
 import { Dialog, Transition } from '@headlessui/react'
 import { DotLoader } from "react-spinners";
 import {
-    ArrowPathIcon,
-    Bars3Icon,
     CloudArrowUpIcon,
     FingerPrintIcon,
-    PaperClipIcon,
-    LockClosedIcon,
-    XMarkIcon,
+    DocumentTextIcon,
+    UserGroupIcon
 } from '@heroicons/react/24/outline'
-import { CheckIcon } from '@heroicons/react/20/solid'
+import { ChatBubbleLeftRightIcon, CheckIcon } from '@heroicons/react/20/solid'
 import screenshot from './screenshot_mvp.png';
 import AWS from 'aws-sdk';
 
@@ -31,19 +28,19 @@ const features = [
         name: 'Interactive Document Engagement:',
         description:
             'Elevate your interaction with documents. Select and converse with your files as if they were knowledgeable consultants. Ask complex questions and receive insightful, AI-powered responses, all within an intuitive chat interface.',
-        icon: LockClosedIcon,
+        icon: DocumentTextIcon,
     },
     {
         name: 'Crystal-Clear Chat Interface:',
         description:
             'Experience unparalleled clarity in document interaction. Your selected files are displayed within our user-friendly chat interface, making it effortless to navigate through your document-driven conversations.',
-        icon: ArrowPathIcon,
+        icon: ChatBubbleLeftRightIcon,
     },
     {
         name: 'Seamless Account Creation:',
         description:
             'Begin your journey towards smarter document management. Our streamlined process ensures you\'re set up and ready to explore the full potential of AI-driven document insights in moments.',
-        icon: FingerPrintIcon,
+        icon: UserGroupIcon,
     },
 ]
 const tiers = [
@@ -140,15 +137,27 @@ const faqs = [
     },
     {
         id: 2,
-        question: "What's the difference between this and ChatGPT?",
+        question: "How does this tool work exactly?",
         answer:
-            "There are three main differences. The first being that ChatGPT does not offer a file storage system for your account, and any documents you have will not be referenced in new conversations. Secondly, our platform offers the ability to directly select and deselect multiple files as a data source, whereas ChatGPT offers a combursome experience to even upload multiple documents let alone cross compare them. Thirdly, to use any upload functionality with ChatGPT you must ge the premium account. Since we strive to reduce the cost of compute, we offer our services for free as of now compared to ChatGPT's premium membership.",
+            "Simply upload your documents, select which ones you want to talk to, and start chatting with them! You can ask questions to multiple files at the same time and have our AI answer them for you. You can also ask for specific information from the documents, and our AI will find the most relevant information for you.",
     },
     {
         id: 3,
+        question: "What's the difference between this and ChatGPT?",
+        answer:
+            "There are three notable distinctions between our service and ChatGPT. Firstly, our platform gives users a storage system for their files, ensuring that documents from previous interactions can be referenced in subsequent conversations. This contrasts with ChatGPT's approach, which can often present challenges in managing and comparing multiple documents. In fact, each new chat does not reference previously uploaded documents. Secondly, our interface allows users to effortlessly select and deselect multiple files as data sources, providing a more streamlined experience compared to the more cumbersome process found in ChatGPT. Lastly, unlike ChatGPT, which necessitates a premium account for access to its document upload functionality, we are committed to minimizing computational costs and, as such, offer our services free of charge",
+    },
+    {
+        id: 4,
         question: "Is my data secure?",
         answer:
             "Yes, we use industry leading cloud database and storage systems provided by AWS. The same databases and storage systems used by your favorite companies such as Netflix, AirBnb, Twitch, McDonald's, and more. Your data is guaranteed to be encrypted and stored securely.",
+    },
+    {
+        id: 5,
+        question: "What are the costs?",
+        answer:
+            "We are committed to minimizing computational costs and, as such, offer our services free of charge through our freemium model. In a few months, we'll begin rolling out a premium version of our service that will offer additional features and functionality. However, our free version will always be available to users.",
     },
 
     // More questions...
@@ -297,7 +306,7 @@ export default function SampleLanding() {
                 <div className="mx-auto grid max-w-7xl grid-cols-1 gap-10 px-6 lg:grid-cols-12 lg:gap-8 lg:px-8">
                     <div className="max-w-xl text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl lg:col-span-7">
                         <h2 className="inline sm:block lg:inline xl:block">Interested in trying it out?</h2>{' '}
-                        <p className="inline sm:block lg:inline xl:block">Subscribe up for early access.</p>
+                        <p className="inline sm:block lg:inline xl:block">Subscribe to get early access.</p>
                     </div>
                     <form className="w-full max-w-md lg:col-span-5 lg:pt-2" onSubmit={handleSubscribe}>
                         <div className="flex gap-x-4">
@@ -321,11 +330,11 @@ export default function SampleLanding() {
                             </button>
                         </div>
                         <p className="mt-4 text-sm leading-6 text-gray-900">
-                            We care about your data. Read our{' '}
+                            After subscribing, we'll send you updates and let you know when we officially {' '}
                             <a href="#" className="font-semibold text-indigo-600 hover:text-indigo-500">
-                                privacy&nbsp;policy
+                                launch!&nbsp;
+                                {/* subscribed! */}
                             </a>
-                            .
                         </p>
                     </form>
                 </div>
@@ -350,7 +359,7 @@ export default function SampleLanding() {
                             /> */}
                         </a>
                     </div>
-                    <div className="flex lg:hidden">
+                    {/* <div className="flex lg:hidden">
                         <button
                             type="button"
                             className="-m-2.5 inline-flex items-center justify-center rounded-md p-2.5 text-gray-700"
@@ -369,9 +378,9 @@ export default function SampleLanding() {
                     </div>
                     <div className="hidden lg:flex lg:flex-1 lg:justify-end">
 
-                    </div>
+                    </div> */}
                 </nav>
-                <Dialog as="div" className="lg:hidden" open={mobileMenuOpen} onClose={setMobileMenuOpen}>
+                {/* <Dialog as="div" className="lg:hidden" open={mobileMenuOpen} onClose={setMobileMenuOpen}>
                     <div className="fixed inset-0 z-50" />
                     <Dialog.Panel className="fixed inset-y-0 right-0 z-50 w-full overflow-y-auto bg-white px-6 py-6 sm:max-w-sm sm:ring-1 sm:ring-gray-900/10">
                         <div className="flex items-center justify-between">
@@ -416,7 +425,7 @@ export default function SampleLanding() {
                             </div>
                         </div>
                     </Dialog.Panel>
-                </Dialog>
+                </Dialog> */}
             </header>
 
             <main className="isolate">
