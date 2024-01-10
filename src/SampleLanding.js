@@ -146,7 +146,7 @@ const faqs = [
         id: 3,
         question: "What's the difference between this and ChatGPT?",
         answer:
-            "<p className=\"text-base leading-7 text-gray-600\">Our service stands out from ChatGPT in three key ways:</p> <ul> <li> 1) We provide a <b>file storage system</b>, letting users reference past documents in new chats, unlike ChatGPT's single-session document handling. </li> <li> 2) Our interface makes <b>selecting and deselecting multiple files</b> easy, offering a smoother experience than ChatGPT's more involved process. </li> <li> 3) Unlike ChatGPT's premium-required document upload, our platform minimizes costs and is <b>free to use</b>.</li> </ul>",
+            "<p className=\"text-base leading-7 text-gray-600\">Our service stands out from ChatGPT in three key ways:</p> <ul><br/> <li> 1) We provide a <b>file storage system</b>, letting users reference past documents in new chats, unlike ChatGPT's single-session document handling. </li> <br/> <li> 2) Our interface makes <b>selecting and deselecting multiple files</b> easy, offering a smoother experience than ChatGPT's more involved process. </li> <br/> <li> 3) Unlike ChatGPT's premium-required document upload, our platform minimizes costs and is <b>free to use</b>.</li> </ul>",
     },
     {
         id: 4,
