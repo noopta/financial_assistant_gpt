@@ -535,7 +535,7 @@ export default function SampleLanding() {
 
                 {/* Testimonial section */}
                 <div className="mx-auto mt-32 max-w-7xl  sm:px-6 lg:px-8">
-                    {CostTables()};
+                    {CostTables()}
                     <div className="relative overflow-hidden bg-gray-900 px-6 py-20 shadow-xl sm:rounded-3xl sm:px-10 sm:py-24 md:px-12 lg:px-20">
                         {/* <img
                             className="absolute inset-0 h-full w-full object-cover brightness-150 saturate-0"
@@ -583,7 +583,7 @@ export default function SampleLanding() {
 
                 {/* FAQs */}
                 <div className="mx-auto max-w-2xl divide-y divide-gray-900/10 px-6 pb-8 sm:pb-24 sm:pt-12 lg:max-w-7xl lg:px-8 lg:pb-32">
-                    <h2 className="text-2xl font-bold leading-10 tracking-tight text-gray-900">Frequently asked questions</h2>
+                    <h2 className="text-2xl font-bold leading-10 tracking-tight text-gray-900 py-4 ">Frequently asked questions</h2>
                     <dl className="mt-10 space-y-8 divide-y divide-gray-900/10">
                         {faqs.map((faq) => (
                             <div key={faq.id} className="pt-8 lg:grid lg:grid-cols-12 lg:gap-8">
