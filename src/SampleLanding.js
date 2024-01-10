@@ -40,7 +40,7 @@ const features = [
     {
         name: 'Seamless Account Creation:',
         description:
-            'Start smarter document management quickly with our streamlined 2 step setup, unlocking AI-driven insights in moments."',
+            'Start smarter document management quickly with our streamlined 2 step setup, unlocking AI-driven insights in moments.',
         icon: UserGroupIcon,
     },
 ]
@@ -134,31 +134,31 @@ const faqs = [
         id: 1,
         question: "Who is this tool useful for?",
         answer:
-            "Anyone who has a lot of documents they need to cross reference and find overlapping information between. This tool is especially useful for students who want to synethisize information from various sources, journalists or writers, legal professionals, and researchers / academics who need to sift through extensive literature.",
+            "<p className=\"text-base leading-7 text-gray-600\">Anyone who has a lot of documents they need to cross reference and find overlapping information between. This tool is especially useful for <b>students</b> who want to synethisize information from various sources, <b>journalists or writers</b>, <b>legal professionals</b>, and <b>researchers / academics</b> who need to sift through extensive literature, to name a few.<p>",
     },
     {
         id: 2,
         question: "How does this tool work exactly?",
         answer:
-            "Simply upload your documents, select which ones you want to talk to, and start chatting with them! You can ask questions to multiple files at the same time and have our AI answer them for you. You can also ask for specific information from the documents, and our AI will find the most relevant information for you.",
+            "<p className=\"text-base leading-7 text-gray-600\">Simply upload your documents, select which ones you want to talk to, and start chatting with them! You can ask questions to multiple files at the same time and have our AI answer them for you. You can also ask for specific information from the documents, and our AI will find the most relevant information for you.</p>",
     },
     {
         id: 3,
         question: "What's the difference between this and ChatGPT?",
         answer:
-            "Our service stands out from ChatGPT in three key ways: 1) We provide a file storage system, letting users reference past documents in new chats, unlike ChatGPT's single-session document handling. 2) Our interface makes selecting and deselecting multiple files easy, offering a smoother experience than ChatGPT's more involved process. 3) Unlike ChatGPT's premium-required document upload, our platform minimizes costs and is free to use.",
+            "<p className=\"text-base leading-7 text-gray-600\">Our service stands out from ChatGPT in three key ways:</p> <ul> <li> 1) We provide a <b>file storage system</b>, letting users reference past documents in new chats, unlike ChatGPT's single-session document handling. </li> <li> 2) Our interface makes <b>selecting and deselecting multiple files</b> easy, offering a smoother experience than ChatGPT's more involved process. </li> <li> 3) Unlike ChatGPT's premium-required document upload, our platform minimizes costs and is <b>free to use</b>.</li> </ul>",
     },
     {
         id: 4,
         question: "Is my data secure?",
         answer:
-            "Yes, we use industry leading cloud database and storage systems provided by AWS. The same databases and storage systems used by your favorite companies such as Netflix, AirBnb, Twitch, McDonald's, and more. Your data is guaranteed to be encrypted and stored securely.",
+            "<p className=\"text-base leading-7 text-gray-600\">Yes, we use industry leading cloud database and storage systems provided by AWS. The same databases and storage systems used by your favorite companies such as Netflix, AirBnb, Twitch, McDonald's, and more. Your data is guaranteed to be encrypted and stored securely.</p>",
     },
     {
         id: 5,
         question: "What are the costs?",
         answer:
-            "We are committed to minimizing computational costs and, as such, offer our services free of charge through our freemium model. In a few months, we'll begin rolling out a premium version of our service that will offer additional features and functionality. However, our free version will always be available to users.",
+            "<p className=\"text-base leading-7 text-gray-600\">We are committed to minimizing computational costs and, as such, offer our services free of charge through our freemium model. In a few months, we'll begin rolling out a premium version of our service that will offer additional features and functionality. However, our free version will always be available to users.</p>",
     },
 
     // More questions...
@@ -447,9 +447,9 @@ export default function SampleLanding() {
                             }}
                         /> */}
                     </div>
-                    {/* <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+                    <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
                         <img src={docusight} style={{ width: '310px', height: '69px' }} className="h-12 w-auto" alt="" />
-                    </div> */}
+                    </div>
                     <div className="py-24 sm:py-32">
 
                         <div className="mx-auto max-w-7xl px-6 lg:px-8">
@@ -460,7 +460,7 @@ export default function SampleLanding() {
                                 </h1>
                                 <p className="mt-6 text-lg leading-8 text-gray-600">
                                     {/* Upload and talk to multiple documents at the same time, giving you the power to cross reference them, find overlapping info, etc. through a simple chat interface allowing you to talk to the files directly. Select and deselect which documents you care to talk to, and have them saved to your account for future reference. */}
-                                    Chat with multiple files to cross-reference, spot overlaps, and more. Just select or deselect documents for discussion and save them in your account for later.
+                                    Chat with multiple files to cross-reference, spot overlaps, and more. Simply select or deselect documents for discussion and save them in your account for later.
                                 </p>
                                 <div className="mt-10 flex items-center justify-center gap-x-6">
                                     <button
@@ -589,7 +589,11 @@ export default function SampleLanding() {
                             <div key={faq.id} className="pt-8 lg:grid lg:grid-cols-12 lg:gap-8">
                                 <dt className="text-base font-semibold leading-7 text-gray-900 lg:col-span-5">{faq.question}</dt>
                                 <dd className="mt-4 lg:col-span-7 lg:mt-0">
-                                    <p className="text-base leading-7 text-gray-600">{faq.answer}</p>
+                                    <div dangerouslySetInnerHTML={{ __html: faq.answer }} />
+                                    {/* <p className="text-base leading-7 text-gray-600"> */}
+                                    {/* {faq.answer} */}
+                                    {/* <div /> */}
+                                    {/* </p> */}
                                 </dd>
                             </div>
                         ))}
