@@ -22,7 +22,7 @@ const features = [
     {
         name: 'Intelligent Document Storage:',
         description:
-            'Securely store your key files. Our platform goes beyond storage, unlocking your documents\' hidden value for easy future access and analysis.',
+            'Securely store your key files. Our platform provides secure storage in the cloud, so you can have easy future access and analysis of documents.',
         icon: CloudArrowUpIcon,
     },
     {
@@ -40,7 +40,7 @@ const features = [
     {
         name: 'Seamless Account Creation:',
         description:
-            'Start smarter document management quickly with our streamlined setup, unlocking AI-driven insights in moments."',
+            'Start smarter document management quickly with our streamlined 2 step setup, unlocking AI-driven insights in moments."',
         icon: UserGroupIcon,
     },
 ]
@@ -225,11 +225,11 @@ export default function SampleLanding() {
             Payload: JSON.stringify({ email: emailInput }) // Your payload here
         };
 
+        setOpenModal(true);
+
         lambda.invoke(params, (err, data) => {
             if (err) {
                 console.error(err);
-            } else {
-                setOpenModal(true);
             }
         });
     }
@@ -427,9 +427,6 @@ export default function SampleLanding() {
                         </div>
                     </Dialog.Panel>
                 </Dialog> */}
-                <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-                    <img src={docusight} style={{ width: '310px', height: '69px' }} className="h-12 w-auto" alt="" />
-                </div>
 
                 {/* <img src={docusight} style={{ width: '350px', height: '80px' }} className="h-12 w-auto" alt="" /> */}
             </header>
@@ -449,6 +446,9 @@ export default function SampleLanding() {
                                     'polygon(74.1% 44.1%, 100% 61.6%, 97.5% 26.9%, 85.5% 0.1%, 80.7% 2%, 72.5% 32.5%, 60.2% 62.4%, 52.4% 68.1%, 47.5% 58.3%, 45.2% 34.5%, 27.5% 76.7%, 0.1% 64.9%, 17.9% 100%, 27.6% 76.8%, 76.1% 97.7%, 74.1% 44.1%)',
                             }}
                         /> */}
+                    </div>
+                    <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+                        <img src={docusight} style={{ width: '310px', height: '69px' }} className="h-12 w-auto" alt="" />
                     </div>
                     <div className="py-24 sm:py-32">
 
