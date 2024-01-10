@@ -9,6 +9,7 @@ import {
 } from '@heroicons/react/24/outline'
 import { ChatBubbleLeftRightIcon, CheckIcon } from '@heroicons/react/20/solid'
 import screenshot from './screenshot_mvp.png';
+import docusight from './3.png';
 import AWS from 'aws-sdk';
 
 const navigation = [
@@ -21,25 +22,25 @@ const features = [
     {
         name: 'Intelligent Document Storage:',
         description:
-            'Securely upload and store your crucial files. Our platform isn\'t just a storage solution; it\'s a gateway to unlocking the hidden value in your documents, readily accessible for future queries and analysis.',
+            'Securely store your key files. Our platform goes beyond storage, unlocking your documents\' hidden value for easy future access and analysis.',
         icon: CloudArrowUpIcon,
     },
     {
         name: 'Interactive Document Engagement:',
         description:
-            'Elevate your interaction with documents. Select and converse with your files as if they were knowledgeable consultants. Ask complex questions and receive insightful, AI-powered responses, all within an intuitive chat interface.',
+            'Enhance document interaction: Chat with your files like expert consultants and get AI-powered insights, all through an intuitive interface.',
         icon: DocumentTextIcon,
     },
     {
         name: 'Crystal-Clear Chat Interface:',
         description:
-            'Experience unparalleled clarity in document interaction. Your selected files are displayed within our user-friendly chat interface, making it effortless to navigate through your document-driven conversations.',
+            'Experience seamless document interaction: Your files are displayed in our user-friendly chat interface for effortless navigation.',
         icon: ChatBubbleLeftRightIcon,
     },
     {
         name: 'Seamless Account Creation:',
         description:
-            'Begin your journey towards smarter document management. Our streamlined process ensures you\'re set up and ready to explore the full potential of AI-driven document insights in moments.',
+            'Start smarter document management quickly with our streamlined setup, unlocking AI-driven insights in moments."',
         icon: UserGroupIcon,
     },
 ]
@@ -145,7 +146,7 @@ const faqs = [
         id: 3,
         question: "What's the difference between this and ChatGPT?",
         answer:
-            "There are three notable distinctions between our service and ChatGPT. Firstly, our platform gives users a storage system for their files, ensuring that documents from previous interactions can be referenced in subsequent conversations. This contrasts with ChatGPT's approach, which can often present challenges in managing and comparing multiple documents. In fact, each new chat does not reference previously uploaded documents. Secondly, our interface allows users to effortlessly select and deselect multiple files as data sources, providing a more streamlined experience compared to the more cumbersome process found in ChatGPT. Lastly, unlike ChatGPT, which necessitates a premium account for access to its document upload functionality, we are committed to minimizing computational costs and, as such, offer our services free of charge",
+            "Our service stands out from ChatGPT in three key ways: 1) We provide a file storage system, letting users reference past documents in new chats, unlike ChatGPT's single-session document handling. 2) Our interface makes selecting and deselecting multiple files easy, offering a smoother experience than ChatGPT's more involved process. 3) Unlike ChatGPT's premium-required document upload, our platform minimizes costs and is free to use.",
     },
     {
         id: 4,
@@ -426,6 +427,11 @@ export default function SampleLanding() {
                         </div>
                     </Dialog.Panel>
                 </Dialog> */}
+                <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+                    <img src={docusight} style={{ width: '310px', height: '69px' }} className="h-12 w-auto" alt="" />
+                </div>
+
+                {/* <img src={docusight} style={{ width: '350px', height: '80px' }} className="h-12 w-auto" alt="" /> */}
             </header>
 
             <main className="isolate">
@@ -435,23 +441,26 @@ export default function SampleLanding() {
                         className="absolute inset-x-0 -top-40 -z-10 transform-gpu overflow-hidden blur-3xl sm:-top-80"
                         aria-hidden="true"
                     >
-                        <div
+
+                        {/* <div
                             className="relative left-[calc(50%-11rem)] aspect-[1155/678] w-[36.125rem] -translate-x-1/2 rotate-[30deg] bg-gradient-to-tr from-[#ff80b5] to-[#9089fc] opacity-30 sm:left-[calc(50%-30rem)] sm:w-[72.1875rem]"
                             style={{
                                 clipPath:
                                     'polygon(74.1% 44.1%, 100% 61.6%, 97.5% 26.9%, 85.5% 0.1%, 80.7% 2%, 72.5% 32.5%, 60.2% 62.4%, 52.4% 68.1%, 47.5% 58.3%, 45.2% 34.5%, 27.5% 76.7%, 0.1% 64.9%, 17.9% 100%, 27.6% 76.8%, 76.1% 97.7%, 74.1% 44.1%)',
                             }}
-                        />
+                        /> */}
                     </div>
                     <div className="py-24 sm:py-32">
+
                         <div className="mx-auto max-w-7xl px-6 lg:px-8">
                             <div className="mx-auto max-w-2xl text-center">
+                                {/* add styling to the image size */}
                                 <h1 className="text-4xl font-bold tracking-tight text-gray-900 sm:text-6xl">
                                     Query documents in parallel through AI.
                                 </h1>
                                 <p className="mt-6 text-lg leading-8 text-gray-600">
                                     {/* Upload and talk to multiple documents at the same time, giving you the power to cross reference them, find overlapping info, etc. through a simple chat interface allowing you to talk to the files directly. Select and deselect which documents you care to talk to, and have them saved to your account for future reference. */}
-                                    Cross reference documents, find overlapping info, and more through a simple chat interface allowing you to talk to the files directly. Select and deselect documents you care to talk to, and have them saved to your account for future reference.
+                                    Chat with multiple files to cross-reference, spot overlaps, and more. Just select or deselect documents for discussion and save them in your account for later.
                                 </p>
                                 <div className="mt-10 flex items-center justify-center gap-x-6">
                                     <button
@@ -498,9 +507,9 @@ export default function SampleLanding() {
                 {/* Feature section */}
                 <div ref={learnMoreRef} className="mx-auto max-w-7xl px-6 lg:px-8">
                     <div className="mx-auto max-w-2xl lg:text-center">
-                        <h2 className="text-base font-semibold leading-7 text-indigo-600">Access files efficiently</h2>
+                        <h2 className="text-base font-semibold leading-7 text-indigo-600">Cross reference efficiently</h2>
                         <p className="mt-2 text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">
-                            Harness the Power of AI to Transform Your Documents into Interactive Knowledge Bases
+                            Turn Your Documents Into Interactive Knowledge Bases Using AI
                         </p>
                         <p className="mt-6 text-lg leading-8 text-gray-600">
                             We know you want to get answers instantly. Just ask via a chat box and let our AI answer queries regarding data between your documents, organized or not.
