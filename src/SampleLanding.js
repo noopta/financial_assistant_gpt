@@ -134,7 +134,7 @@ const faqs = [
         id: 1,
         question: "Who is this tool useful for?",
         answer:
-            "<p className=\"text-base leading-7 text-gray-600\">Essentially anyone who has documentsf they need to cross reference and find overlapping information between. This tool is especially useful for <b>students</b> who want to synethisize information from various sources, <b>journalists or writers</b>, <b>legal professionals</b>, and <b>researchers / academics</b> who need to sift through extensive literature, to name a few.<p>",
+            "<p className=\"text-base leading-7 text-gray-600\">Essentially anyone who has documents they need to cross reference and find overlapping information between. This tool is especially useful for <b>students</b> who want to synethisize information from various sources, <b>journalists or writers</b>, <b>legal professionals</b>, and <b>researchers / academics</b> who need to sift through extensive literature, to name a few.<p>",
     }, {
         id: 2,
         question: "What are some use cases?",
