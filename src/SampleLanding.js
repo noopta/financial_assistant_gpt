@@ -134,10 +134,15 @@ const faqs = [
         id: 1,
         question: "Who is this tool useful for?",
         answer:
-            "<p className=\"text-base leading-7 text-gray-600\">Anyone who has a lot of documents they need to cross reference and find overlapping information between. This tool is especially useful for <b>students</b> who want to synethisize information from various sources, <b>journalists or writers</b>, <b>legal professionals</b>, and <b>researchers / academics</b> who need to sift through extensive literature, to name a few.<p>",
+            "<p className=\"text-base leading-7 text-gray-600\">Essentially anyone who has documentsf they need to cross reference and find overlapping information between. This tool is especially useful for <b>students</b> who want to synethisize information from various sources, <b>journalists or writers</b>, <b>legal professionals</b>, and <b>researchers / academics</b> who need to sift through extensive literature, to name a few.<p>",
+    }, {
+        id: 2,
+        question: "What are some use cases?",
+        answer:
+            "<ul><br /><li>1) Researchers looking to compare the findings of multiple academic papers.</li> <br /> <li>2) Investors looking for insights into a companies financial health through earning reports.</li> <br /> <li>3) Music fans looking to extract themes and concepts from songs on an artists album.</li> </ul>",
     },
     {
-        id: 2,
+        id: 3,
         question: "How does this tool work exactly?",
         answer:
             "<p className=\"text-base leading-7 text-gray-600\">Simply upload your documents, select which ones you want to talk to, and start chatting with them! You can ask questions to multiple files at the same time and have our AI answer them for you. You can also ask for specific information from the documents, and our AI will find the most relevant information for you.</p>",
@@ -146,7 +151,7 @@ const faqs = [
         id: 3,
         question: "What's the difference between this and ChatGPT?",
         answer:
-            "<p className=\"text-base leading-7 text-gray-600\">Our service stands out from ChatGPT in three key ways:</p> <ul><br/> <li> 1) We provide a <b>file storage system</b>, letting users reference past documents in new chats, unlike ChatGPT's single-session document handling. </li> <br/> <li> 2) Our interface makes <b>selecting and deselecting multiple files</b> easy, offering a smoother experience than ChatGPT's more involved process. </li> <br/> <li> 3) Unlike ChatGPT's premium-required document upload, our platform minimizes costs and is <b>free to use</b>.</li> </ul>",
+            "<p className=\"text-base leading-7 text-gray-600\">Our service is different than ChatGPT in three key ways:</p> <ul><br/> <li> 1) We provide a <b>file storage system</b>, letting users reference past documents in new chats, unlike ChatGPT's single-session document handling. </li> <br/> <li> 2) Our interface makes <b>selecting and deselecting multiple files</b> easy, letting users talk to multiple documents simultaneously. </li> <br/> <li> 3) Unlike ChatGPT's premium-required document upload, our platform minimizes costs and is <b>free to use</b>.</li> </ul>",
     },
     {
         id: 4,
@@ -460,7 +465,7 @@ export default function SampleLanding() {
                                 </h1>
                                 <p className="mt-6 text-lg leading-8 text-gray-600">
                                     {/* Upload and talk to multiple documents at the same time, giving you the power to cross reference them, find overlapping info, etc. through a simple chat interface allowing you to talk to the files directly. Select and deselect which documents you care to talk to, and have them saved to your account for future reference. */}
-                                    Chat with multiple files to cross-reference, spot overlaps, and more. Simply select or deselect documents for discussion and save them in your account for later.
+                                    Cross reference documents, find overlapping info, and more through a simple chat interface allowing you to talk to the files directly. Select and deselect documents you care to talk to, and have them saved to your account for future reference.
                                 </p>
                                 <div className="mt-10 flex items-center justify-center gap-x-6">
                                     <button
