@@ -9,7 +9,7 @@ import {
 } from '@heroicons/react/24/outline'
 import { ChatBubbleLeftRightIcon, CheckIcon } from '@heroicons/react/20/solid'
 import screenshot from './screenshot_mvp.png';
-import docusight from './3.png';
+import docusync from './docusync_2.png'
 import AWS from 'aws-sdk';
 
 const navigation = [
@@ -453,7 +453,7 @@ export default function SampleLanding() {
                         /> */}
                     </div>
                     <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-                        <img src={docusight} style={{ width: '310px', height: '69px' }} className="h-12 w-auto" alt="" />
+                        <img src={docusync} style={{ width: '310px', height: '69px' }} className="h-12 w-auto" alt="" />
                     </div>
                     <div className="py-24 sm:py-32">
 
@@ -574,7 +574,7 @@ export default function SampleLanding() {
                             <figure>
                                 <blockquote className="mt-6 text-lg font-semibold text-white sm:text-xl sm:leading-8">
                                     <p>
-                                        "Utilizing DocuSight AI has significantly transformed my research process, especially when working with extensive collections of academic papers. Its ability to facilitate efficient cross-referencing and fact-checking through intuitive queries is remarkable. This tool not only enhances the accuracy of my work but also substantially saves time by revealing correlations between various documents with ease."
+                                        "Utilizing DocuSync AI has significantly transformed my research process, especially when working with extensive collections of academic papers. Its ability to facilitate efficient cross-referencing and fact-checking through intuitive queries is remarkable. This tool not only enhances the accuracy of my work but also substantially saves time by revealing correlations between various documents with ease."
                                     </p>
                                 </blockquote>
                                 <figcaption className="mt-6 text-base text-white">
