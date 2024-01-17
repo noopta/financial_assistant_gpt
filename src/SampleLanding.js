@@ -213,8 +213,8 @@ export default function SampleLanding() {
 
     AWS.config.update({
         region: 'us-east-2',
-        accessKeyId: process.env.ACCESS_KEY,
-        secretAccessKey: process.env.SECRET_KEY
+        accessKeyId: process.env.REACT_APP_ACCESS_KEY,
+        secretAccessKey: process.env.REACT_APP_SECRET_KEY
     });
 
     const handleSubscribe = async (e) => {
