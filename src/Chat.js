@@ -1,4 +1,4 @@
-import { Fragment, useState } from 'react'
+import { Fragment, useEffect, useState } from 'react'
 import { Dialog, Disclosure, Listbox, Transition, Combobox } from '@headlessui/react'
 import { CheckIcon, CalendarDaysIcon, HandRaisedIcon, Bars3Icon, XMarkIcon, MinusSmallIcon, PlusSmallIcon, FaceSmileIcon as FaceSmileIconOutline, PaperClipIcon, DocumentPlusIcon, FolderPlusIcon, FolderIcon, HashtagIcon, } from '@heroicons/react/24/outline'
 import { Link } from 'react-router-dom';
@@ -78,6 +78,52 @@ export default function Chat() {
     const [faqs, setFaqs] = useState([]);
     const [loginPrompt, setLoginPrompt] = useState(false);
     const { authUser, login, logout } = useAuth();
+
+    const getExistingFilesOnLoad = async () => {
+        if (authUser == null) {
+            return;
+        }
+
+        // should this be done client side or server side?
+        // it would theoretically be the same files both ways, so maybe server side is better 
+        // because it's more secure?
+        // get files from S3 
+
+        const response = await fetch('http://127.0.0.1:5000/get-s3-files', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                bucket: authUser["firstName"] + authUser["lastName"] + "-bucket"
+            }),
+        });
+
+        if (response.ok) {
+            const data = await response.json();
+            console.log("Received data:", data);
+            var tempFileList = [];
+
+            for (let i = 0; i < data['fileList'].length; i++) {
+                tempFileList.push({
+                    fileName: data['fileList'][i],
+                    selected: false
+                })
+            }
+
+            setFileList(tempFileList);
+            // Now you can access data.result and data.fileList
+        } else {
+            console.error("Error in fetch:", response.status, response.statusText);
+        }
+    }
+
+    useEffect(() => {
+        getExistingFilesOnLoad();
+    }, []);
+
+    // if the user is logged in on chat load, make a request to the backend to get the existing files
+
 
     const handleFileChange = (event) => {
         // Filter out non-PDF files
@@ -218,9 +264,6 @@ export default function Chat() {
         });
 
         const data = await response.json();
-        // const response = await fetch('http://127.0.0.1:5000/upload-files');
-
-        // const data = await response.json();
 
         if (!data['result'] == "success") {
             console.log("error")
@@ -493,7 +536,8 @@ export default function Chat() {
                     </form>
                 </div>
             </div>
-            <span className="inline-flex items-center gap-x-1.5 rounded-md px-2 py-1 text-xs font-medium text-white ring-1 ring-inset ring-gray-800">
+
+            <span className="inline-flex flex-wrap gap-x-1.5 gap-y-2 rounded-md px-2 py-1 text-xs font-medium text-white ring-1 ring-inset ring-gray-800">
                 {fileList && fileList.length > 0 && fileList.map((file, index) => (
                     <span onClick={() => handleFileClick(`svg-${index}`, index)} className="inline-flex items-center gap-x-1.5 rounded-md px-2 py-1 text-xs font-medium text-white ring-1 ring-inset ring-gray-800">
                         <svg id={`svg-${index}`} className="h-1.5 w-1.5 fill-indigo-400" viewBox="0 0 6 6" aria-hidden="true">
@@ -503,6 +547,7 @@ export default function Chat() {
                     </span>
                 ))}
             </span>
+
 
             {/* TextInput section */}
             <div className="bg-gray-900">
