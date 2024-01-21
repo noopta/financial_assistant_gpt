@@ -10,6 +10,8 @@ from botocore.exceptions import NoCredentialsError, ClientError
 app = Flask(__name__)
 CORS(app)
 
+s3 = boto3.client('s3')
+
 OpenAI.api_key = os.getenv('OPENAI_API_KEY')
 client = OpenAI()
 
@@ -17,7 +19,7 @@ thread = client.beta.threads.create()
 
 def readFromS3(bucket_name, input_assistant_id, fileList):
     # Create an S3 client
-    s3 = boto3.client('s3')
+    # s3 = boto3.client('s3')
     # Your S3 bucket name
 
     # Retrieve the list of existing objects in the bucket
@@ -165,9 +167,11 @@ def askAssistant(query, input_assistant_id, fileList):
     )
     # Iterate through the messages to find the assistant's response
     assistant_response = None
+    totalMessages = []
     for message in newMessages:
         if message.role == "assistant":
             assistant_response = message.content
+            # totalMessages.append(message.content)
             break
 
     # Assuming you have the assistant_response as previously retrieved
@@ -185,7 +189,7 @@ def askAssistant(query, input_assistant_id, fileList):
         return "No response from the assistant found."
 
 def create_cors_configuration(bucket_name):
-    s3 = boto3.client('s3')
+    # s3 = boto3.client('s3')
 
     cors_configuration = {
         'CORSRules': [{
@@ -237,8 +241,8 @@ def add_user_to_database(userInfo):
                 'lastName': userInfo['lastName'],
                 'company': userInfo['company'],
                 'password': userInfo['password'],
-                'country': userInfo['country'],
-                'city': userInfo['city'],
+                # 'country': userInfo['country'],
+                # 'city': userInfo['city'],
                 'account_type': 'standard_user',
                 'bucket_name': (userInfo['firstName'] + userInfo['lastName'] + '-bucket').lower(),
                 'assistant_name': userInfo['email'] + "Financial Assistant",
@@ -256,7 +260,7 @@ def add_user_to_database(userInfo):
 
 def create_s3_folders(bucketName):
     try:
-        s3 = boto3.client('s3')
+        # s3 = boto3.client('s3')
         bucket_name = bucketName
         s3.put_object(Bucket=bucket_name, Key='chat/')
         s3.put_object(Bucket=bucket_name, Key='newsletter/')
@@ -305,11 +309,46 @@ def createS3Folder():
 def parseFrontEndResponse():
     return "yo"
 
+@app.route('/get-file-list-on-load', methods=['POST'])
+def get_files():
+    print("yo")
+
+
 @app.route('/get-s3-files', methods=['POST'])
 def getS3Files():
+    # def getFileNames(bucketName):
+        # return fileList
 
+    print("yo")
+    data = request.json
+    
+    print("received data")
+    print(data)
+    fileList = []
+    bucketName = data["bucket"]
+    # print(bucketName)
+    # s3 = boto3.client('s3')
+    response = s3.list_objects_v2(Bucket=bucketName, Prefix="chat/")       
+    # print(response)
+        # List all objects
+    if 'Contents' in response:
+        for obj in response['Contents']:
+            # Skip if the key is a directory
+            if obj['Key'].endswith('/'):
+                continue
 
-    return "yo"
+            print(f"Object Key: {obj['Key']}")
+            # The local path to which the file should be downloaded
+            local_file_name = os.path.join('/home/ubuntu/financial_assistant_gpt/server/temp', os.path.basename(obj['Key']))
+            fileName = obj['Key'][:len(local_file_name) - 4]
+            fileList.append(fileName[5:len(fileName) - 4])
+    
+    print(fileList)
+    
+    return jsonify({
+        "result": "success",
+        "fileList": fileList
+    })
 
 @app.route('/upload-files', methods=['POST'])
 def uploadFiles():
@@ -365,8 +404,6 @@ def create_newsletter():
     uploadToNewsletterAssistant("asst_GJbo1LDmZZgjyxqSwAJhGb3G")
     response = getNewsletterResponse(data, "asst_GJbo1LDmZZgjyxqSwAJhGb3G")
     print(response)
-
-
 
 def readFromS3Newsletter(s3):
     # Create an S3 client
