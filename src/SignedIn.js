@@ -54,9 +54,9 @@ function checkPrimaryKey(primaryKeyValue, loginToAccount) {
 const navigation = [
     { name: 'Home', href: '#' },
     { name: 'Chat', href: '#' },
-    { name: 'Health Checker', href: '#' },
     { name: 'Contact Us', href: '#' }
 ]
+
 export default function SignedIn() {
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
     const { authUser, login, logout } = useAuth();

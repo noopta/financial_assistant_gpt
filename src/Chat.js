@@ -95,7 +95,7 @@ export default function Chat() {
                 'Content-Type': 'application/json',
             },
             body: JSON.stringify({
-                bucket: authUser["firstName"] + authUser["lastName"] + "-bucket"
+                bucket: authUser["bucket"]
             }),
         });
 
@@ -175,7 +175,7 @@ export default function Chat() {
                                 return;
                             }
 
-                            var authBucketName = authUser['firstName'] + authUser['lastName'] + "-bucket";
+                            var authBucketName = authUser["bucket"];
 
                             await sendDataToS3(authBucketName, file.name, text);
                             resolve(); // Resolve the promise after upload
@@ -200,7 +200,7 @@ export default function Chat() {
                                 return;
                             }
 
-                            var authBucketName = authUser['firstName'] + authUser['lastName'] + "-bucket";
+                            var authBucketName = authUser["bucket"];
 
                             await sendDataToS3(authBucketName, newFileName, textContents.join('\n'));
                             resolve(); // Resolve the promise after upload
@@ -258,7 +258,7 @@ export default function Chat() {
                 'Content-Type': 'application/json',
             },
             body: JSON.stringify({
-                bucket: authUser["firstName"] + authUser["lastName"] + "-bucket",
+                bucket: authUser["bucket"],
                 assistant_id: authUser["assistant_id"],
             }),
         });
@@ -302,6 +302,15 @@ export default function Chat() {
         });
     }
 
+    function formatTextToHTML(text) {
+        const formattedText = text
+            .replace(/\n/g, '<br>') // Replace line breaks with <br>
+            .replace(/\*\*/g, '') // Optionally handle other markdown-like formatting
+        // Add more replacements as needed
+
+        return formattedText;
+    }
+
     const GenerateRow = async (faqs, setFaqs, newRowQuestion, isModalOpen, setModalOpen) => {
         // gotta make the backend API call here
         // make program wait until the response is received
@@ -316,23 +325,26 @@ export default function Chat() {
 
         // filter for files in fileList that have selected == true
         let selectedFiles = fileList.filter(obj => obj.selected === true);
-
-        const response = await sendResponseToBackend(newRowQuestion, authUser["assistant_id"], selectedFiles);
-        setModalOpen(false);
-
-        function formatTextToHTML(text) {
-            const formattedText = text
-                .replace(/\n/g, '<br>') // Replace line breaks with <br>
-                .replace(/\*\*/g, '') // Optionally handle other markdown-like formatting
-            // Add more replacements as needed
-
-            return formattedText;
+        var response = null;
+        try {
+            response = await sendResponseToBackend(newRowQuestion, authUser["assistant_id"], selectedFiles);
+        } catch (error) {
+            setModalOpen(false);
+            setFaqs(prevFaqs => [...prevFaqs, {
+                question: newRowQuestion,
+                answer: "Sorry an error occurred, please wait 10-15 seconds and try again.",
+            }]);
+            console.log("logging error")
+            console.log("error")
+            return "error"
         }
+        setModalOpen(false);
 
         setFaqs(prevFaqs => [...prevFaqs, {
             question: newRowQuestion,
             answer: formatTextToHTML(response['answer']),
         }]);
+
         console.log("yo")
 
         return "sucess"

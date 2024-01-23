@@ -22,7 +22,7 @@ export default function Testimonials() {
                                     />
                                     <div className="text-base">
                                         <div className="font-semibold text-white">Shuvanan Islam</div>
-                                        <div className="mt-1 text-gray-400">CEO of Stragic Retail Partners <br /> Valued at $50 Million</div>
+                                        <div className="mt-1 text-gray-400">CEO of Stragic Retail Partners <br /> Former Director of Finance at Canada Bread</div>
                                     </div>
                                 </figcaption>
                             </figure>
@@ -74,8 +74,8 @@ export default function Testimonials() {
                                         alt=""
                                     />
                                     <div className="text-base">
-                                        <div className="font-semibold text-white">Georges Engogue</div>
-                                        <div className="mt-1 text-gray-400">Software Engineer at Microsoft <br /> Former 2x Software Engineer Intern at Amazon</div>
+                                        <div className="font-semibold text-white">Victor R.</div>
+                                        <div className="mt-1 text-gray-400">M.D.<br /> Harvard Medical School Graduate</div>
                                     </div>
                                 </figcaption>
                             </figure>

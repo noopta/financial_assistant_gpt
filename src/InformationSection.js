@@ -6,6 +6,7 @@ import {
   LockClosedIcon,
   ServerIcon,
 } from '@heroicons/react/20/solid'
+import screenshot from './screenshot_mvp_2.png'
 
 const features = [
   {
@@ -45,17 +46,19 @@ export default function InformationSection() {
     <div className="bg-gray-900 py-24 sm:py-32">
       <div className="mx-auto max-w-7xl px-6 lg:px-8">
         <div className="mx-auto max-w-2xl sm:text-center">
-          <h2 className="text-base font-semibold leading-7 text-indigo-400">Everything you need</h2>
-          <p className="mt-2 text-3xl font-bold tracking-tight text-white sm:text-4xl">Not an accountant? No problem.</p>
+          <h2 className="text-base font-semibold leading-7 text-indigo-400">Multi-document analysis</h2>
+          <p className="mt-2 text-3xl font-bold tracking-tight text-white sm:text-4xl">Tired of reading through documents? Let AI take care of the work for you.</p>
           <p className="mt-6 text-lg leading-8 text-gray-300">
-            Let AI do the heavy lifting. We'll categorize your expenses, summarize your financials, and provide relevant insight so you can focus on what matters most.
+            {/* We'll categorize your expenses, summarize your financials, and provide relevant insight so you can focus on what matters most. */}
+            Simply upload your documents in PDF or TXT format, select which ones you want to talk to, and start asking them questions.
           </p>
         </div>
       </div>
       <div className="relative overflow-hidden pt-16">
         <div className="mx-auto max-w-7xl px-6 lg:px-8">
           <img
-            src="https://tailwindui.com/img/component-images/dark-project-app-screenshot.png"
+            // src="https://tailwindui.com/img/component-images/dark-project-app-screenshot.png"
+            src={screenshot}
             alt="App screenshot"
             className="mb-[-12%] rounded-xl shadow-2xl ring-1 ring-white/10"
             width={2432}

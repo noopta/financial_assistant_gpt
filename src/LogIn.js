@@ -137,6 +137,10 @@ const registerUser = async (userInfo, thisSetOpen) => {
 
     userInfo["firstName"] = userInfo["firstName"].replace(/\s/g, "");
     userInfo["lastName"] = userInfo["lastName"].replace(/\s/g, "");
+    userInfo["bucket_name"] = userInfo["bucket_name"].replace(/\s/g, "");
+    userInfo["bucket_name"] = userInfo["bucket_name"].replace("@", "-");
+    userInfo["bucket_name"] = userInfo["bucket_name"].replace(".", "-");
+    userInfo["bucket_name"] = userInfo["bucket_name"].replace("_", "-");
     const response = await fetch('http://127.0.0.1:5000/sign-up', {
         method: 'POST',
         headers: {
