@@ -328,6 +328,16 @@ export default function Chat() {
         var response = null;
         try {
             response = await sendResponseToBackend(newRowQuestion, authUser["assistant_id"], selectedFiles);
+
+            if (response['answer'] == "image") {
+                setModalOpen(false)
+                setFaqs(prevFaqs => [...prevFaqs, {
+                    question: newRowQuestion,
+                    answer: "Sorry, we do not generate images currently. Try asking another question.",
+                }]);
+
+                return "sucess";
+            }
         } catch (error) {
             setModalOpen(false);
             setFaqs(prevFaqs => [...prevFaqs, {
