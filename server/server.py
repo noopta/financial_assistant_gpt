@@ -151,7 +151,20 @@ def askAssistant(query, input_assistant_id, fileList):
         print("*****")
         print(newMessages.data[0].role )
 
-        if newMessages.data[0].role == "assistant" and len(newMessages.data[0].content[0].text.value) > 0:
+        # if newMessages.data[0].role == "assistant" and len(newMessages.data[0].content[0].text.value) > 0:
+        if(newMessages.data[0].role == "assistant" and len(newMessages.data[0].content) > 0):
+            if(newMessages.data[0].content[0].type == "image_file"):
+                return "image"
+            
+            if(newMessages.data[0].content[0].type == "text"):
+                print("text")
+            print("\n")
+            print("image")
+            print("\n")
+            print(newMessages.data)
+            #  if image then return a message saying it's an image
+            # OR TRY UPLOADING THE IMAGE TO S3 
+            #  else return the message 
             break
 
     # time.sleep(15)
@@ -206,11 +219,12 @@ def create_cors_configuration(bucket_name):
 
 def create_bucket(bucket_name, region=None):
     # convert bucket_name to lower case
-    bucket_name = bucket_name.lower()
+    # bucket_name = bucket_name.lower()
     try:
         if region is None:
             s3_client = boto3.client('s3')
             s3_client.create_bucket(Bucket=bucket_name)
+            print("bucket created " + bucket_name)
         else:
             s3_client = boto3.client('s3', region_name=region)
             location = {'LocationConstraint': region}
@@ -244,7 +258,7 @@ def add_user_to_database(userInfo):
                 # 'country': userInfo['country'],
                 # 'city': userInfo['city'],
                 'account_type': 'standard_user',
-                'bucket_name': (userInfo['firstName'] + userInfo['lastName'] + '-bucket').lower(),
+                'bucket_name': userInfo['bucket_name'],
                 'assistant_name': userInfo['email'] + "Financial Assistant",
                 'assistant_id': assistant_id
             }
@@ -325,7 +339,7 @@ def getS3Files():
     print("received data")
     print(data)
     fileList = []
-    bucketName = data["bucket"]
+    bucketName = data["bucket"].lower()
     # print(bucketName)
     # s3 = boto3.client('s3')
     response = s3.list_objects_v2(Bucket=bucketName, Prefix="chat/")       
@@ -386,8 +400,10 @@ def handle_sign_up():
     # print("Received data:", data)
     print("Received dataa:", data['text'])
     add_user_to_database(data['text'])
-    bucketName = (data['text']['firstName'] + data['text']['lastName'] + '-bucket').lower()
-    
+    # bucketName = (data['text']['firstName'] + data['text']['lastName'] + '-bucket').lower()
+    bucketName = data['text']['bucket_name']
+    bucketName = bucketName.lower()
+
     create_bucket(bucketName, region='us-east-2')
     create_s3_folders(bucketName)
     
