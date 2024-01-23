@@ -54,22 +54,27 @@ const sendResponseToBackend = async (query, input_assistant_id, selectedFiles) =
         fileNames += selectedFiles[i]['fileName'] + ", "
     }
 
-    const response = await fetch('http://127.0.0.1:5000/post-endpoint', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-            text: query,
-            assistant_id: input_assistant_id,
-            fileList: fileNames
-        }),
-    });
+    try {
+        const response = await fetch('http://127.0.0.1:5000/post-endpoint', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                text: query,
+                assistant_id: input_assistant_id,
+                fileList: fileNames
+            }),
+        });
 
-    const data = await response.json();
+        const data = await response.json();
 
-    console.log(data); // { text: 'Hello, World!' }
-    return data;
+        console.log(data); // { text: 'Hello, World!' }
+        return data;
+    } catch (error) {
+        console.log(error);
+        return "error"
+    }
 }
 
 export default function Chat() {
@@ -223,6 +228,10 @@ export default function Chat() {
             console.log("All uploads completed");
 
             uploadFilesToAssistant().then(newList => {
+                if (newList == "error") {
+                    console.log("error")
+                    // display some error notification here
+                }
                 var i = 0;
                 var tempList = [];
 
@@ -252,27 +261,32 @@ export default function Chat() {
 
     const uploadFilesToAssistant = async () => {
         // send a request to our backend to retrieve the S3 files and run the GPT-4 model
-        const response = await fetch('http://127.0.0.1:5000/upload-files', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                bucket: authUser["bucket"],
-                assistant_id: authUser["assistant_id"],
-            }),
-        });
+        try {
+            const response = await fetch('http://127.0.0.1:5000/upload-files', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    bucket: authUser["bucket"],
+                    assistant_id: authUser["assistant_id"],
+                }),
+            });
 
-        const data = await response.json();
+            const data = await response.json();
 
-        if (!data['result'] == "success") {
-            console.log("error")
-            return;
+            if (!data['result'] == "success") {
+                console.log("error")
+                return;
+            }
+
+            console.log(data); // { text: 'Hello, World!' }
+
+            return data['fileList'];
+        } catch (error) {
+            console.log("error");
+            return "error";
         }
-
-        console.log(data); // { text: 'Hello, World!' }
-
-        return data['fileList'];
     }
 
     const sendDataToS3 = (bucketName, fileName, content) => {
@@ -328,6 +342,11 @@ export default function Chat() {
         var response = null;
         try {
             response = await sendResponseToBackend(newRowQuestion, authUser["assistant_id"], selectedFiles);
+
+            if (response == "error") {
+                console.log("an error occurred");
+                // probably just notify the user
+            }
 
             if (response['answer'] == "image") {
                 setModalOpen(false)
