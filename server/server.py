@@ -154,18 +154,20 @@ def askAssistant(query, input_assistant_id, fileList):
         # if newMessages.data[0].role == "assistant" and len(newMessages.data[0].content[0].text.value) > 0:
         if(newMessages.data[0].role == "assistant" and len(newMessages.data[0].content) > 0):
             if(newMessages.data[0].content[0].type == "image_file"):
+                print("image")
                 return "image"
             
-            if(newMessages.data[0].content[0].type == "text"):
+            if(newMessages.data[0].content[0].type == "text" and len(newMessages.data[0].content[0].text.value) > 0):
                 print("text")
-            print("\n")
-            print("image")
-            print("\n")
-            print(newMessages.data)
-            #  if image then return a message saying it's an image
-            # OR TRY UPLOADING THE IMAGE TO S3 
-            #  else return the message 
-            break
+                break
+            # print("\n")
+            # print("image")
+            # print("\n")
+            # print(newMessages.data)
+            # #  if image then return a message saying it's an image
+            # # OR TRY UPLOADING THE IMAGE TO S3 
+            # #  else return the message 
+            # break
 
     # time.sleep(15)
 
