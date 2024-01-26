@@ -55,7 +55,7 @@ const sendResponseToBackend = async (query, input_assistant_id, selectedFiles) =
     }
 
     try {
-        const response = await fetch('http://127.0.0.1:5000/post-endpoint', {
+        const response = await fetch('http://3.132.214.69:80/post-endpoint', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -94,7 +94,7 @@ export default function Chat() {
         // because it's more secure?
         // get files from S3 
 
-        const response = await fetch('http://127.0.0.1:5000/get-s3-files', {
+        const response = await fetch('http://3.132.214.69:80/get-s3-files', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -262,7 +262,7 @@ export default function Chat() {
     const uploadFilesToAssistant = async () => {
         // send a request to our backend to retrieve the S3 files and run the GPT-4 model
         try {
-            const response = await fetch('http://127.0.0.1:5000/upload-files', {
+            const response = await fetch('http://3.132.214.69:80/upload-files', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -317,6 +317,9 @@ export default function Chat() {
     }
 
     function formatTextToHTML(text) {
+        console.log("logging text");
+        console.log(text);
+
         const formattedText = text
             .replace(/\n/g, '<br>') // Replace line breaks with <br>
             .replace(/\*\*/g, '') // Optionally handle other markdown-like formatting

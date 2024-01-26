@@ -130,7 +130,7 @@ const createUserS3Folders = (userInfo) => {
     });
 }
 
-const registerUser = async (userInfo, thisSetOpen) => {
+const registerUser = async (userInfo, setOpenModal) => {
     // here we want to create an S3 bucket for the user
     // add them to the dynamo DB table 
     console.log("yo")
@@ -141,7 +141,7 @@ const registerUser = async (userInfo, thisSetOpen) => {
     userInfo["bucket_name"] = userInfo["bucket_name"].replace("@", "-");
     userInfo["bucket_name"] = userInfo["bucket_name"].replace(".", "-");
     userInfo["bucket_name"] = userInfo["bucket_name"].replace("_", "-");
-    const response = await fetch('http://127.0.0.1:5000/sign-up', {
+    const response = await fetch('http://3.132.214.69:80/sign-up', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
@@ -150,11 +150,10 @@ const registerUser = async (userInfo, thisSetOpen) => {
     });
 
     const data = await response.json();
+    setOpenModal(false);
 
-    if (data["result"] == "success") {
-        // close modal
-        thisSetOpen(false);
-    } else {
+    if (data["result"] != "success") {
+        // close modal 
         alert("Error: " + data["result"]);
     }
 
@@ -217,6 +216,7 @@ export default function LogIn() {
     const [thisOpen, setThisOpen] = useState(false);
     const [signUpError, setSignUpError] = useState(false);
     const [signUpErrorMessage, setSignUpErrorMessage] = useState("");
+    const [openModal, setOpenModal] = useState(false);
 
     const handleSubmit = (event) => {
         console.log("yo");
@@ -258,6 +258,8 @@ export default function LogIn() {
         return (
             <form onSubmit={(e) => {
                 e.preventDefault();
+                thisSetOpen(false);
+                setOpenModal(true);
                 console.log("at form submit");
                 var userInfo = {
                     "email": document.getElementById("signUpEmail").value,
@@ -289,7 +291,7 @@ export default function LogIn() {
 
                 // make a post request to the backend to add the user to the database
 
-                registerUser(userInfo, thisSetOpen);
+                registerUser(userInfo, setOpenModal);
             }}>
                 <div className="space-y-12">
                     <div className="border-b border-white/10 pb-12">
@@ -386,40 +388,10 @@ export default function LogIn() {
                                     />
                                 </div>
                             </div>
-
-                            {/* <div className="sm:col-span-3">
-                                <label htmlFor="country" className="block text-sm font-medium leading-6 text-white">
-                                    Country
-                                </label>
-                                <div className="mt-2">
-                                    <input
-                                        type="text"
-                                        name="country"
-                                        id="country"
-                                        autoComplete="address-level2"
-                                        className="block w-full rounded-md border-0 bg-white/5 py-1.5 text-white shadow-sm ring-1 ring-inset ring-white/10 focus:ring-2 focus:ring-inset focus:ring-indigo-500 sm:text-sm sm:leading-6"
-                                    />
-                                </div>
-                            </div>
-    
-                            <div className="sm:col-span-3">
-                                <label htmlFor="city" className="block text-sm font-medium leading-6 text-white">
-                                    City
-                                </label>
-                                <div className="mt-2">
-                                    <input
-                                        type="text"
-                                        name="city"
-                                        id="city"
-                                        autoComplete="address-level2"
-                                        className="block w-full rounded-md border-0 bg-white/5 py-1.5 text-white shadow-sm ring-1 ring-inset ring-white/10 focus:ring-2 focus:ring-inset focus:ring-indigo-500 sm:text-sm sm:leading-6"
-                                    />
-                                </div>
-                            </div> */}
-
                         </div>
                     </div>
                 </div>
+
 
                 <div className="mt-6 flex items-center justify-end gap-x-6">
                     <button type="button" className="text-sm font-semibold leading-6 text-white">
@@ -435,6 +407,72 @@ export default function LogIn() {
             </form>
         );
     }
+
+
+    const LoadingModal = ({ openModal, setOpenModal }) => {
+        const controller = new AbortController();
+
+        return (
+            <Transition.Root show={openModal} as={Fragment}>
+                <Dialog as="div" className="relative z-10" onClose={() => console.log("close")}>
+                    <Transition.Child
+                        as={Fragment}
+                        enter="ease-out duration-300"
+                        enterFrom="opacity-0"
+                        enterTo="opacity-100"
+                        leave="ease-in duration-200"
+                        leaveFrom="opacity-100"
+                        leaveTo="opacity-0"
+                    >
+                        <div className="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" />
+                    </Transition.Child>
+
+                    <div className="fixed inset-0 z-10 w-screen overflow-y-auto">
+                        <div className="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0">
+                            <Transition.Child
+                                as={Fragment}
+                                enter="ease-out duration-300"
+                                enterFrom="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
+                                enterTo="opacity-100 translate-y-0 sm:scale-100"
+                                leave="ease-in duration-200"
+                                leaveFrom="opacity-100 translate-y-0 sm:scale-100"
+                                leaveTo="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
+                            >
+                                <Dialog.Panel className="relative transform overflow-hidden rounded-lg bg-white px-4 pb-4 pt-5 text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-sm sm:p-6">
+                                    <div>
+                                        <div className="mx-auto flex h-12 w-12 items-center justify-center ">
+                                            <DotLoader color="#36d7b7" />
+                                        </div>
+                                        <div className="mt-3 text-center sm:mt-5">
+
+                                            <div className="mt-2">
+                                                <p className="text-sm text-gray-500">
+                                                    Hold on, we're signing you up...
+                                                </p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div className="mt-5 sm:mt-6">
+                                        <button
+                                            type="button"
+                                            className="inline-flex w-full justify-center rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+                                            onClick={() => {
+                                                controller.abort();
+                                                setOpenModal(false);
+                                            }}
+                                        >
+                                            Close Modal
+                                        </button>
+                                    </div>
+                                </Dialog.Panel>
+                            </Transition.Child>
+                        </div>
+                    </div>
+                </Dialog>
+            </Transition.Root>
+        )
+    }
+
 
     const SignUp = ({ thisOpen, thisSetOpen }) => {
         // const [thisOpen, thisSetOpen] = useState(false);
@@ -491,6 +529,8 @@ export default function LogIn() {
     return (
         <>
             <div className="bg-gray-900 px-6 py-24 lg:px-8">
+                {/* <LoadingModal openModal={openModal} setOpenModal={setOpenModal} /> */}
+                {openModal && <LoadingModal openModal={openModal} setOpenModal={setOpenModal} />}
                 {thisOpen && <SignUp thisOpen={thisOpen} thisSetOpen={setThisOpen} />}
 
                 <header className="absolute inset-x-0 top-0 z-50">
@@ -576,8 +616,6 @@ export default function LogIn() {
                     </Dialog>
 
                 </header>
-
-
 
                 <div className="  flex min-h-full flex-1 flex-col justify-center px-6 py-4 lg:px-8">
                     <div className="sm:mx-auto sm:w-full sm:max-w-sm">
