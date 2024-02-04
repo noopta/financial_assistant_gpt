@@ -1,18 +1,23 @@
 import shutil
 import time
 from openai import OpenAI
+import openai
 import os
 import boto3
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 from botocore.exceptions import NoCredentialsError, ClientError
 
+# openai.api_key = os.getenv('OPENAI_API_KEY')
+OpenAI.api_key = os.getenv('OPENAI_API_KEY')
+
 app = Flask(__name__)
 CORS(app)
 
 s3 = boto3.client('s3')
 
-OpenAI.api_key = os.getenv('OPENAI_API_KEY')
+# OpenAI.api_key = os.getenv('OPENAI_API_KEY')
+
 client = OpenAI()
 
 thread = client.beta.threads.create()
@@ -180,6 +185,7 @@ def askAssistant(query, input_assistant_id, fileList):
     newMessages = client.beta.threads.messages.list(
         thread_id=thread.id
     )
+
     # Iterate through the messages to find the assistant's response
     assistant_response = None
     totalMessages = []
