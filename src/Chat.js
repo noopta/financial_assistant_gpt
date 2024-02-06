@@ -55,7 +55,7 @@ const sendResponseToBackend = async (query, input_assistant_id, selectedFiles) =
     }
 
     try {
-        const response = await fetch('http://3.132.214.69/post-endpoint', {
+        const response = await fetch('http://3.132.214.69:5000/post-endpoint', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
