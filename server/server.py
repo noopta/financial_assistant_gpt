@@ -1,7 +1,6 @@
 import shutil
 import time
 from openai import OpenAI
-import openai
 import os
 import boto3
 from flask import Flask, request, jsonify
