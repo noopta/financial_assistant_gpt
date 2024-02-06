@@ -94,7 +94,7 @@ export default function Chat() {
         // because it's more secure?
         // get files from S3 
 
-        const response = await fetch('http://3.132.214.69:5000/get-s3-files', {
+        const response = await fetch('https://3.132.214.69:5000/get-s3-files', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
