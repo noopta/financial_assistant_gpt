@@ -44,8 +44,8 @@ export default function Testimonials() {
                                         alt=""
                                     />
                                     <div className="text-base">
-                                        <div className="font-semibold text-white">James Lemiux</div>
-                                        <div className="mt-1 text-gray-400">Founder of Wavequeue <br /> Former Software Engineer at Meta, Google</div>
+                                        <div className="font-semibold text-white">J L</div>
+                                        <div className="mt-1 text-gray-400">Founder  <br /> Software Engineer</div>
                                     </div>
                                 </figcaption>
                             </figure>

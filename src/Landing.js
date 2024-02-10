@@ -194,7 +194,7 @@ export default function Landing() {
                             className="mt-16 rounded-md bg-white/5 shadow-2xl ring-1 ring-white/10 sm:mt-24"
                         /> */}
 
-                        <Testimonials />
+                        {/* <Testimonials /> */}
                     </div>
                 </div>
             </div>
