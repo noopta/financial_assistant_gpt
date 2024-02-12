@@ -122,13 +122,15 @@ export default function Landing() {
                             <div className="-my-6 divide-y divide-gray-500/25">
                                 <div className="space-y-2 py-6">
                                     {navigation.map((item) => (
-                                        <a
-                                            key={item.name}
-                                            href={item.href}
-                                            className="-mx-3 block rounded-lg px-3 py-2 text-base font-semibold leading-7 text-white hover:bg-gray-800"
-                                        >
-                                            {item.name}
-                                        </a>
+                                        <Link to={item.name}>
+                                            <a
+                                                key={item.name}
+                                                href={item.href}
+                                                className="-mx-3 block rounded-lg px-3 py-2 text-base font-semibold leading-7 text-white hover:bg-gray-800"
+                                            >
+                                                {item.name}
+                                            </a>
+                                        </Link>
                                     ))}
                                 </div>
                                 <div className="py-6">
@@ -136,7 +138,9 @@ export default function Landing() {
                                         href="#"
                                         className="-mx-3 block rounded-lg px-3 py-2.5 text-base font-semibold leading-7 text-white hover:bg-gray-800"
                                     >
-                                        Log in
+                                        <Link to="/Log In">
+                                            Log in
+                                        </Link>
                                     </a>
                                 </div>
                             </div>
@@ -164,7 +168,7 @@ Key is saved at:         /etc/letsencrypt/live/docusync.ai/privkey.pem */}
                     <div className="mx-auto max-w-7xl px-6 lg:px-8">
                         <div className="mx-auto max-w-2xl text-center">
                             <h1 className="text-4xl font-bold tracking-tight text-white sm:text-6xl">
-                                Your documenttt analyst and storage system!
+                                Your document analyst and storage system!
                             </h1>
                             <p className="mt-6 text-lg leading-8 text-gray-300">
                                 DocuSync is an interactive chatbot that helps you analyze, compare, contrast, and derive insights from querying agsint multiple documents such as textbooks, financial earnings, resumes, and more.
