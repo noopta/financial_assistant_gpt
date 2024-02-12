@@ -518,13 +518,15 @@ export default function Chat() {
                             <div className="-my-6 divide-y divide-gray-500/25">
                                 <div className="space-y-2 py-6">
                                     {navigation.map((item) => (
-                                        <a
-                                            key={item.name}
-                                            href={item.href}
-                                            className="-mx-3 block rounded-lg px-3 py-2 text-base font-semibold leading-7 text-white hover:bg-gray-800"
-                                        >
-                                            {item.name}
-                                        </a>
+                                        <Link to={item.name}>
+                                            <a
+                                                key={item.name}
+                                                href={item.href}
+                                                className="-mx-3 block rounded-lg px-3 py-2 text-base font-semibold leading-7 text-white hover:bg-gray-800"
+                                            >
+                                                {item.name}
+                                            </a>
+                                        </Link>
                                     ))}
                                 </div>
                                 <div className="py-6">
