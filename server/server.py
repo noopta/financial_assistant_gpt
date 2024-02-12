@@ -326,10 +326,6 @@ def create_assistant(userInfo):
 def createS3Folder():
     print("yo")
 
-@app.route('/')
-def parseFrontEndResponse():
-    return "yo"
-
 @app.route('/get-file-list-on-load', methods=['POST'])
 def get_files():
     print("yo")
