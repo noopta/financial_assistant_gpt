@@ -141,7 +141,7 @@ const registerUser = async (userInfo, setOpenModal) => {
     userInfo["bucket_name"] = userInfo["bucket_name"].replace("@", "-");
     userInfo["bucket_name"] = userInfo["bucket_name"].replace(".", "-");
     userInfo["bucket_name"] = userInfo["bucket_name"].replace("_", "-");
-    const response = await fetch('https://docusync.ai/sign-up', {
+    const response = await fetch('https://api.docusync.ai/sign-up', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
