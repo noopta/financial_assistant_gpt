@@ -16,7 +16,7 @@ import * as pdfjsLib from 'pdfjs-dist/build/pdf';
 import { DotLoader } from "react-spinners";
 import { eventWrapper } from '@testing-library/user-event/dist/utils';
 import { useAuth } from './AuthProvider'; // Path to your AuthContext file
-import Logo from './docusync_white.png';
+import Logo from './docusync_indigo.png';
 
 pdfjsLib.GlobalWorkerOptions.workerSrc = process.env.PUBLIC_URL + '/pdf.worker.mjs';
 

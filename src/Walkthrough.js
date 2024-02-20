@@ -4,7 +4,7 @@ import { useAuth } from './AuthProvider'; // Path to your AuthContext file
 import { Link } from 'react-router-dom';
 import { Dialog, Disclosure, Listbox, Transition, Combobox } from '@headlessui/react'
 import { Bars3Icon, XMarkIcon, MinusSmallIcon, PlusSmallIcon, FaceSmileIcon as FaceSmileIconOutline, PaperClipIcon, DocumentPlusIcon, FolderPlusIcon, FolderIcon, HashtagIcon, } from '@heroicons/react/24/outline';
-import Logo from './docusync_white.png';
+import Logo from './docusync_indigo.png';
 
 const features = [
     {

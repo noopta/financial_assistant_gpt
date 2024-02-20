@@ -16,7 +16,7 @@ import './App.css'; // Make sure to include the CSS file in the same directory
 import { useAuth } from './AuthProvider';
 import { Link } from 'react-router-dom';
 import Testimonials from './Testimonials.js';
-import Logo from './docusync_white.png'
+import Logo from './docusync_indigo.png'
 
 pdfjsLib.GlobalWorkerOptions.workerSrc = process.env.PUBLIC_URL + '/pdf.worker.mjs';
 

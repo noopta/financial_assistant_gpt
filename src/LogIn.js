@@ -16,7 +16,7 @@ import * as pdfjsLib from 'pdfjs-dist/build/pdf';
 import { DotLoader } from "react-spinners";
 import { eventWrapper } from '@testing-library/user-event/dist/utils';
 import { AuthProvider, useAuth } from './AuthProvider'; // Path to your AuthContext file
-import Logo from './docusync_white.png';
+import Logo from './docusync_indigo.png';
 
 const dynamoDB = new AWS.DynamoDB.DocumentClient();
 const s3 = new AWS.S3();
