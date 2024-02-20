@@ -16,6 +16,7 @@ import './App.css'; // Make sure to include the CSS file in the same directory
 import { useAuth } from './AuthProvider';
 import { Link } from 'react-router-dom';
 import Testimonials from './Testimonials.js';
+import Logo from './docusync_white.png'
 
 pdfjsLib.GlobalWorkerOptions.workerSrc = process.env.PUBLIC_URL + '/pdf.worker.mjs';
 
@@ -61,6 +62,7 @@ export default function Landing() {
     const { authUser, login, logout } = useAuth();
 
     return (
+        // <div className="bg-gray-900 px-6 py-24 lg:px-8">
         <div className="bg-gray-900">
             <header className="absolute inset-x-0 top-0 z-50">
                 <nav className="flex items-center justify-between p-6 lg:px-8" aria-label="Global">
@@ -69,7 +71,8 @@ export default function Landing() {
                             <span className="sr-only">Your Company</span>
                             <img
                                 className="h-8 w-auto"
-                                src="https://tailwindui.com/img/logos/mark.svg?color=indigo&shade=500"
+                                // src="https://tailwindui.com/img/logos/mark.svg?color=indigo&shade=500"
+                                src={Logo}
                                 alt=""
                             />
                         </a>
@@ -105,7 +108,8 @@ export default function Landing() {
                                 <span className="sr-only">Your Company</span>
                                 <img
                                     className="h-8 w-auto"
-                                    src="https://tailwindui.com/img/logos/mark.svg?color=indigo&shade=500"
+                                    // src="https://tailwindui.com/img/logos/mark.svg?color=indigo&shade=500"
+                                    src={Logo}
                                     alt=""
                                 />
                             </a>

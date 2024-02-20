@@ -16,6 +16,7 @@ import { DotLoader } from "react-spinners";
 import { eventWrapper } from '@testing-library/user-event/dist/utils';
 import { useAuth } from './AuthProvider'; // Path to your AuthContext file
 import SignUp from './SignUp';
+import Logo from './docusync_white.png';
 
 const dynamoDB = new AWS.DynamoDB.DocumentClient();
 
@@ -78,7 +79,8 @@ export default function SignedIn() {
                                     <span className="sr-only">Your Company</span>
                                     <img
                                         className="h-8 w-auto"
-                                        src="https://tailwindui.com/img/logos/mark.svg?color=indigo&shade=500"
+                                        // src="https://tailwindui.com/img/logos/mark.svg?color=indigo&shade=500"
+                                        src={Logo}
                                         alt=""
                                     />
                                 </a>
@@ -114,7 +116,8 @@ export default function SignedIn() {
                                         <span className="sr-only">Your Company</span>
                                         <img
                                             className="h-8 w-auto"
-                                            src="https://tailwindui.com/img/logos/mark.svg?color=indigo&shade=500"
+                                            // src="https://tailwindui.com/img/logos/mark.svg?color=indigo&shade=500"
+                                            src={Logo}
                                             alt=""
                                         />
                                     </a>
