@@ -64,72 +64,6 @@ function checkPrimaryKey(primaryKeyValue, login) {
     });
 }
 
-const addUserToDynamoDB = async (userInfo) => {
-    const params = {
-        TableName: "financial_assistant_gpt_db",
-        Item: {
-            // Your item's attributes
-            "email": userInfo.email,
-            "firstName": userInfo.firstName,
-            "lastName": userInfo.lastName,
-            "company": userInfo.company,
-            "password": userInfo.password,
-            // "country": userInfo.country,
-            // "city": userInfo.city
-        }
-    };
-
-    try {
-        await dynamoDB.put(params).promise();
-        console.log("Item added successfully");
-    } catch (error) {
-        console.error("Error adding item:", error);
-    }
-};
-
-const createUserS3Bucket = async (userInfo) => {
-    const params = {
-        Bucket: userInfo.email + "_bucket",
-        CreateBucketConfiguration: {
-            LocationConstraint: 'us-east-2' // e.g., 'us-west-2'
-        }
-    };
-
-    try {
-        const data = await s3.createBucket(params).promise();
-        console.log('Bucket Created Successfully', data.Location);
-    } catch (err) {
-        console.log('Error', err);
-    }
-}
-
-const createUserS3Folders = (userInfo) => {
-    var chatFolderName = "chatFolder/";
-    var newsLetterFolderName = "newsletterFolder/";
-
-    s3.putObject({
-        Bucket: userInfo.email + "_bucket",
-        Key: chatFolderName
-    }, function (err, data) {
-        if (err) {
-            console.log(err);
-        } else {
-            console.log("Successfully created folder");
-        }
-    });
-
-    s3.putObject({
-        Bucket: userInfo.email + "_bucket",
-        Key: newsLetterFolderName
-    }, function (err, data) {
-        if (err) {
-            console.log(err);
-        } else {
-            console.log("Successfully created folder");
-        }
-    });
-}
-
 const registerUser = async (userInfo, setOpenModal) => {
     // here we want to create an S3 bucket for the user
     // add them to the dynamo DB table 
@@ -346,7 +280,7 @@ export default function LogIn() {
 
                             <div className="sm:col-span-2">
                                 <label htmlFor="postal-code" className="block text-sm font-medium leading-6 text-white">
-                                    Company Name
+                                    DocuSync AI
                                 </label>
                                 <div className="mt-2">
                                     <input
