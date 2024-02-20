@@ -462,7 +462,8 @@ export default function LogIn() {
 
     return (
         <>
-            <div className="bg-gray-900 px-6 lg:px-8">
+            {/* <div className="bg-gray-900 px-6 py-24 lg:px-8"> */}
+            <div className="bg-gray-900 px-6 py-24 lg:px-8 min-h-screen">
                 {/* <LoadingModal openModal={openModal} setOpenModal={setOpenModal} /> */}
                 {openModal && <LoadingModal openModal={openModal} setOpenModal={setOpenModal} />}
                 {thisOpen && <SignUp thisOpen={thisOpen} thisSetOpen={setThisOpen} />}
