@@ -534,7 +534,9 @@ export default function Chat() {
                                         href="#"
                                         className="-mx-3 block rounded-lg px-3 py-2.5 text-base font-semibold leading-7 text-white hover:bg-gray-800"
                                     >
-                                        Log in
+                                        <Link to="/Log In">
+                                            Log in
+                                        </Link>
                                     </a>
                                 </div>
                             </div>
