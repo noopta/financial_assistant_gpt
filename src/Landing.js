@@ -122,7 +122,7 @@ export default function Landing() {
                             <div className="-my-6 divide-y divide-gray-500/25">
                                 <div className="space-y-2 py-6">
                                     {navigation.map((item) => (
-                                        <Link to={item.name}>
+                                        <Link to={"/" + item.name}>
                                             <a
                                                 key={item.name}
                                                 href={item.href}
