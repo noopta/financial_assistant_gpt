@@ -16,6 +16,7 @@ import * as pdfjsLib from 'pdfjs-dist/build/pdf';
 import { DotLoader } from "react-spinners";
 import { eventWrapper } from '@testing-library/user-event/dist/utils';
 import { AuthProvider, useAuth } from './AuthProvider'; // Path to your AuthContext file
+import { Logo } from './docusight.png';
 
 const dynamoDB = new AWS.DynamoDB.DocumentClient();
 const s3 = new AWS.S3();
@@ -475,7 +476,8 @@ export default function LogIn() {
                                 <span className="sr-only">Your Company</span>
                                 <img
                                     className="h-8 w-auto"
-                                    src="https://tailwindui.com/img/logos/mark.svg?color=indigo&shade=500"
+                                    // src="https://tailwindui.com/img/logos/mark.svg?color=indigo&shade=500"
+                                    src={Logo}
                                     alt=""
                                 />
                             </a>
@@ -511,7 +513,8 @@ export default function LogIn() {
                                     <span className="sr-only">Your Company</span>
                                     <img
                                         className="h-8 w-auto"
-                                        src="https://tailwindui.com/img/logos/mark.svg?color=indigo&shade=500"
+                                        // src="https://tailwindui.com/img/logos/mark.svg?color=indigo&shade=500"
+                                        src="Logo"
                                         alt=""
                                     />
                                 </a>
@@ -558,7 +561,8 @@ export default function LogIn() {
                     <div className="sm:mx-auto sm:w-full sm:max-w-sm">
                         <img
                             className="mx-auto h-10 w-auto"
-                            src="https://tailwindui.com/img/logos/mark.svg?color=indigo&shade=500"
+                            // src="https://tailwindui.com/img/logos/mark.svg?color=indigo&shade=500"
+                            src={Logo}
                             alt="Your Company"
                         />
                         <h2 className="mt-10 text-center text-2xl font-bold leading-9 tracking-tight text-white">
