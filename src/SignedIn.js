@@ -65,7 +65,7 @@ export default function SignedIn() {
 
     return (
         <>
-            <div className="bg-gray-900 py-24 sm:py-32">
+            <div className="bg-gray-900 py-24 sm:py-32 min-h-full">
                 <div className="bg-gray-900 px-6 py-24 lg:px-8">
                     <header className="absolute inset-x-0 top-0 z-50">
                         <nav className="flex items-center justify-between p-6 lg:px-8" aria-label="Global">
