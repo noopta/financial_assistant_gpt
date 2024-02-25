@@ -63,11 +63,6 @@ export default function SignedIn() {
     const { authUser, login, logout } = useAuth();
     const [open, setOpen] = useState(true)
 
-    const handleSubmit = (event) => {
-        console.log("yo");
-
-        checkPrimaryKey(event.target.email.value, login);
-    }
     return (
         <>
             <div className="bg-gray-900 py-24 sm:py-32">
@@ -97,7 +92,7 @@ export default function SignedIn() {
                             </div>
                             <div className="hidden lg:flex lg:gap-x-12">
                                 {navigation.map((item) => (
-                                    <a key={item.name} href={item.href} className="text-sm font-semibold leading-6 text-white">
+                                    <a key={item.name} className="text-sm font-semibold leading-6 text-white">
                                         <Link to={"/" + item.name} >{item.name}</Link>
                                     </a>
                                 ))}
