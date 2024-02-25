@@ -281,7 +281,7 @@ export default function LogIn() {
 
                             <div className="sm:col-span-2">
                                 <label htmlFor="postal-code" className="block text-sm font-medium leading-6 text-white">
-                                    DocuSync AI
+                                    Company / Organization Name
                                 </label>
                                 <div className="mt-2">
                                     <input

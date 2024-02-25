@@ -172,7 +172,7 @@ Key is saved at:         /etc/letsencrypt/live/docusync.ai/privkey.pem */}
                     <div className="mx-auto max-w-7xl px-6 lg:px-8">
                         <div className="mx-auto max-w-2xl text-center">
                             <h1 className="text-4xl font-bold tracking-tight text-white sm:text-6xl">
-                                Your document analyst and storage system!
+                                Your document analyst and storage system.
                             </h1>
                             <p className="mt-6 text-lg leading-8 text-gray-300">
                                 DocuSync is an interactive chatbot that helps you analyze, compare, contrast, and derive insights from querying agsint multiple documents such as textbooks, financial earnings, resumes, and more.
