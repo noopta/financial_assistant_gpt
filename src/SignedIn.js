@@ -55,7 +55,7 @@ function checkPrimaryKey(primaryKeyValue, loginToAccount) {
 const navigation = [
     { name: 'Home', href: '#' },
     { name: 'Chat', href: '#' },
-    { name: 'Contact Us', href: '#' }
+    { name: 'Walkthrough', href: '#' }
 ]
 
 export default function SignedIn() {
