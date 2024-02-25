@@ -92,7 +92,7 @@ export default function SignedIn() {
                             </div>
                             <div className="hidden lg:flex lg:gap-x-12">
                                 {navigation.map((item) => (
-                                    <a key={item.name} className="text-sm font-semibold leading-6 text-white">
+                                    <a key={item.name} href={item.href} className="text-sm font-semibold leading-6 text-white">
                                         <Link to={"/" + item.name} >{item.name}</Link>
                                     </a>
                                 ))}
@@ -134,7 +134,9 @@ export default function SignedIn() {
                                                     href={item.href}
                                                     className="-mx-3 block rounded-lg px-3 py-2 text-base font-semibold leading-7 text-white hover:bg-gray-800"
                                                 >
-                                                    {item.name}
+                                                    <Link to={"/" + item.name} >
+                                                        {item.name}
+                                                    </Link>
                                                 </a>
                                             ))}
                                         </div>
