@@ -21,7 +21,7 @@ const features = [
   },
   {
     name: 'Instant answers.',
-    description: 'We know you\'re busy. Get answers to your questions instantly, and skip the waiting game that your local accountant or investment banker plays.',
+    description: 'We know you\'re busy. Get answers to your questions instantly, and avoid having to read through the documents yourself.',
     icon: ArrowPathIcon,
   }
   // {
