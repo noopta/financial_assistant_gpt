@@ -38,7 +38,7 @@ function checkPrimaryKey(primaryKeyValue, loginToAccount) {
                 console.log("Account with that email found:", data.Item);
 
                 if (data.Item['password'] === document.getElementById("password").value) {
-                    console.log("Password matches.");
+                    // console.log("Password matches.");
                     const credentials = {
                         "email": data.Item['email']
                     }
@@ -65,8 +65,8 @@ export default function SignedIn() {
 
     return (
         <>
-            <div className="bg-gray-900 py-24 sm:py-32 min-h-full">
-                <div className="bg-gray-900 px-6 py-24 lg:px-8">
+            <div className="bg-gray-900 py-24 sm:py-32 min-h-full" style={{ minHeight: '100vh' }}>
+                <div className="bg-gray-900 px-6 py-24 lg:px-8 min-h-full">
                     <header className="absolute inset-x-0 top-0 z-50">
                         <nav className="flex items-center justify-between p-6 lg:px-8" aria-label="Global">
                             <div className="flex lg:flex-1">

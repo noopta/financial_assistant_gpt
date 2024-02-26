@@ -69,7 +69,7 @@ const sendResponseToBackend = async (query, input_assistant_id, selectedFiles) =
 
         const data = await response.json();
 
-        console.log(data); // { text: 'Hello, World!' }
+        // console.log(data); // { text: 'Hello, World!' }
         return data;
     } catch (error) {
         console.log(error);
@@ -106,7 +106,7 @@ export default function Chat() {
 
         if (response.ok) {
             const data = await response.json();
-            console.log("Received data:", data);
+            // console.log("Received data:", data);
             var tempFileList = [];
 
             for (let i = 0; i < data['fileList'].length; i++) {
@@ -145,7 +145,7 @@ export default function Chat() {
 
     const handleUpload = async () => {
 
-        console.log("handleUpload");
+        // console.log("handleUpload");
         if (authUser == null) {
             setUploadLoginPrompt(true);
             return;
@@ -162,8 +162,8 @@ export default function Chat() {
 
         const tempFileList = fileList.slice();
 
-        console.log("loggin authUser")
-        console.log(authUser)
+        // console.log("loggin authUser")
+        // console.log(authUser)
 
         for (let file of selectedFiles) {
             const reader = new FileReader();
@@ -174,7 +174,7 @@ export default function Chat() {
                     try {
                         if (fileType === 'text/plain') {
                             const text = (e.target.result);
-                            console.log(text);
+                            // console.log(text);
 
                             if (authUser == null) {
                                 return;
@@ -198,7 +198,7 @@ export default function Chat() {
                                 textContents.push(textContent.items.map(item => item.str).join(' '));
                             }
 
-                            console.log(textContents.join('\n')); // Extracted text
+                            // console.log(textContents.join('\n')); // Extracted text
                             const newFileName = file.name.replace(".pdf", ".txt");
 
                             if (authUser == null) {
@@ -225,7 +225,7 @@ export default function Chat() {
 
         Promise.all(promises).then(() => {
             // if (promises.length > 0) {
-            console.log("All uploads completed");
+            // console.log("All uploads completed");
 
             uploadFilesToAssistant().then(newList => {
                 if (newList == "error") {
@@ -251,7 +251,7 @@ export default function Chat() {
             // TODO: You should figure out the content to be sent based on all uploaded files.
             // For example, you might want to concatenate the names of files or any identifiers which were just uploaded.
             const text = "All files have been processed and uploaded"; // Provide actual content here
-            console.log(text)
+            // console.log(text)
             // }
         }).catch((error) => {
             console.error("Error occurred while uploading files", error);
@@ -280,7 +280,7 @@ export default function Chat() {
                 return;
             }
 
-            console.log(data); // { text: 'Hello, World!' }
+            // console.log(data); // { text: 'Hello, World!' }
 
             return data['fileList'];
         } catch (error) {
@@ -290,9 +290,6 @@ export default function Chat() {
     }
 
     const sendDataToS3 = (bucketName, fileName, content) => {
-
-        console.log("yoooooooo")
-        console.log(bucketName)
 
         // currently I'm sending via client side which will require CORS 
         // if I send via backend then I can use the AWS SDK to send the data without CORS
@@ -317,9 +314,6 @@ export default function Chat() {
     }
 
     function formatTextToHTML(text) {
-        console.log("logging text");
-        console.log(text);
-
         const formattedText = text
             .replace(/\n/g, '<br>') // Replace line breaks with <br>
             .replace(/\*\*/g, '') // Optionally handle other markdown-like formatting
@@ -376,8 +370,6 @@ export default function Chat() {
             question: newRowQuestion,
             answer: formatTextToHTML(response['answer']),
         }]);
-
-        console.log("yo")
 
         return "sucess"
     }
@@ -757,7 +749,6 @@ const UploadLoadingModal = ({ isUploadLoadingModalOpen, setIsUploadLoadingModalO
                                         type="button"
                                         className="inline-flex w-full justify-center rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
                                         onClick={() => {
-                                            console.log("yo");
                                             controller.abort();
                                             setIsUploadLoadingModalOpen(false)
                                         }}

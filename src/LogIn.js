@@ -54,7 +54,7 @@ function checkPrimaryKey(primaryKeyValue, login) {
                         "assistant_id": data.Item['assistant_id']
                     }
 
-                    console.log("credentialss: ", credentials);
+                    // console.log("credentialss: ", credentials);
 
                     login(credentials);
                 } else {
