@@ -106,12 +106,14 @@ export default function Landing() {
                         <div className="flex items-center justify-between">
                             <a href="#" className="-m-1.5 p-1.5">
                                 <span className="sr-only">Your Company</span>
-                                <img
-                                    className="h-8 w-auto"
-                                    // src="https://tailwindui.com/img/logos/mark.svg?color=indigo&shade=500"
-                                    src={Logo}
-                                    alt=""
-                                />
+                                <Link to="/">
+                                    <img
+                                        className="h-8 w-auto"
+                                        // src="https://tailwindui.com/img/logos/mark.svg?color=indigo&shade=500"
+                                        src={Logo}
+                                        alt=""
+                                    />
+                                </Link>
                             </a>
                             <button
                                 type="button"
@@ -204,7 +206,7 @@ Key is saved at:         /etc/letsencrypt/live/docusync.ai/privkey.pem */}
                             className="mt-16 rounded-md bg-white/5 shadow-2xl ring-1 ring-white/10 sm:mt-24"
                         /> */}
 
-                        {/* <Testimonials /> */}
+                        <Testimonials />
                     </div>
                 </div>
             </div>

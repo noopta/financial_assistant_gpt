@@ -474,12 +474,14 @@ export default function LogIn() {
                         <div className="flex lg:flex-1">
                             <a href="#" className="-m-1.5 p-1.5">
                                 <span className="sr-only">Your Company</span>
-                                <img
-                                    className="h-8 w-auto"
-                                    // src="https://tailwindui.com/img/logos/mark.svg?color=indigo&shade=500"
-                                    src={Logo}
-                                    alt=""
-                                />
+                                <Link to="/">
+                                    <img
+                                        className="h-8 w-auto"
+                                        // src="https://tailwindui.com/img/logos/mark.svg?color=indigo&shade=500"
+                                        src={Logo}
+                                        alt=""
+                                    />
+                                </Link>
                             </a>
                         </div>
                         <div className="flex lg:hidden">
