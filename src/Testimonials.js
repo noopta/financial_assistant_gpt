@@ -19,7 +19,7 @@ export default function Testimonials() {
                                         alt=""
                                     /> */}
                                     <div className="text-base">
-                                        <div className="font-semibold text-white">Shuvanan I.</div>
+                                        <div className="font-semibold text-white">Shuv I.</div>
                                         <div className="mt-1 text-gray-400">CEO of Stragic Retail Partners</div>
                                     </div>
                                 </figcaption>
