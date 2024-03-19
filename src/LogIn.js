@@ -92,7 +92,10 @@ const registerUser = async (userInfo, setOpenModal) => {
         alert("Error: " + data["result"]);
     }
 
-    console.log(data); // { text: 'Hello, World!' }
+    handleSubscribe();
+
+    // console.log(data); 
+    // { text: 'Hello, World!' }
     // addUserToDynamoDB(userInfo)
     // create a folder in the S3 bucket for them 
     // createUserS3Bucket(userInfo);
@@ -142,6 +145,25 @@ const navigation = [
 ]
 
 
+const handleSubscribe = async (e) => {
+    e.preventDefault();
+    //  prevent default
+    var emailInput = document.getElementById("signUpEmail").value;
+
+    const lambda = new AWS.Lambda();
+
+    const params = {
+        FunctionName: 'twilioTextWithEmailLambda',
+        InvocationType: 'RequestResponse', // 'Event' for async
+        Payload: JSON.stringify({ email: emailInput }) // Your payload here
+    };
+
+    lambda.invoke(params, (err, data) => {
+        if (err) {
+            console.error(err);
+        }
+    });
+}
 
 export default function LogIn() {
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
@@ -200,7 +222,7 @@ export default function LogIn() {
                     "email": document.getElementById("signUpEmail").value,
                     "firstName": document.getElementById("first-name").value,
                     "lastName": document.getElementById("last-name").value,
-                    "company": document.getElementById("company-name").value,
+                    // "company": document.getElementById("company-name").value,
                     "password": document.getElementById("signUpPassword").value,
                     "retypePassword": document.getElementById("retypePassword").value,
                     // "country": document.getElementById("country").value,
@@ -279,7 +301,7 @@ export default function LogIn() {
                                 </div>
                             </div>
 
-                            <div className="sm:col-span-2">
+                            {/* <div className="sm:col-span-2">
                                 <label htmlFor="postal-code" className="block text-sm font-medium leading-6 text-white">
                                     Company / Organization Name
                                 </label>
@@ -292,7 +314,7 @@ export default function LogIn() {
                                         className="block w-full rounded-md border-0 bg-white/5 py-1.5 text-white shadow-sm ring-1 ring-inset ring-white/10 focus:ring-2 focus:ring-inset focus:ring-indigo-500 sm:text-sm sm:leading-6"
                                     />
                                 </div>
-                            </div>
+                            </div> */}
 
                             <div className="sm:col-span-3">
                                 <label htmlFor="first-name" className="block text-sm font-medium leading-6 text-white">
