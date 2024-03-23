@@ -216,6 +216,31 @@ export default function LogIn() {
     }
 
     const RegistrationForm = (thisSetOpen) => {
+        const handleSubscribe = async () => {
+            //  prevent default
+            AWS.config.update({
+                region: 'us-east-2',
+                accessKeyId: process.env.REACT_APP_AWS_ACCESS_KEY_ID,
+                secretAccessKey: process.env.REACT_APP_AWS_SECRET_ACCESS_KEY,
+            });
+
+            var emailInput = document.getElementById("signUpEmail").value;
+
+            const lambda = new AWS.Lambda();
+
+            const params = {
+                FunctionName: 'twilioTextWithEmailLambda',
+                InvocationType: 'RequestResponse', // 'Event' for async
+                Payload: JSON.stringify({ email: emailInput }) // Your payload here
+            };
+
+            lambda.invoke(params, (err, data) => {
+                if (err) {
+                    console.error(err);
+                }
+            });
+        }
+
         let errorMap = new Map();
 
         errorMap['empty email'] = 'Please enter an email.';
@@ -229,6 +254,7 @@ export default function LogIn() {
         return (
             <form onSubmit={(e) => {
                 e.preventDefault();
+                handleSubscribe();
                 thisSetOpen(false);
                 setOpenModal(true);
                 console.log("at form submit");
